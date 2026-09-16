@@ -1,0 +1,1110 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#14181b">
+<style>:root{color-scheme:dark}html,body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Itamae</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  :root{
+    --bg:#14181b;
+    --panel:#1e2429;
+    --panel-alt:#262d33;
+    --rice:#f3e9d2;
+    --salmon:#f2907a;
+    --wasabi:#7fa84c;
+    --gold:#e8a33d;
+    --text:#f3efe6;
+    --text-muted:#9ba3a8;
+    --border:rgba(243,233,210,0.12);
+    --tile-shadow: 0 2px 0 rgba(0,0,0,0.35), 0 6px 14px rgba(0,0,0,0.35);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Zen Maru Gothic","Segoe UI",sans-serif;
+    padding:20px 16px 40px;
+    min-height:100vh;
+  }
+  h1,h2,h3{text-wrap:balance;margin:0;}
+
+  .wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:18px;}
+
+  /* header */
+  .topbar{
+    display:flex;flex-wrap:wrap;gap:14px 24px;align-items:flex-end;justify-content:space-between;
+    border-bottom:1px solid var(--border);padding-bottom:16px;
+  }
+  .brand{display:flex;flex-direction:column;gap:4px;}
+  .brand .kanji{
+    font-family:"Shippori Mincho",serif;font-weight:700;font-size:2.2rem;color:var(--rice);letter-spacing:0.02em;
+  }
+  .brand .sub{font-size:0.8rem;color:var(--text-muted);letter-spacing:0.04em;}
+  .stats{display:flex;gap:22px;}
+  .stat{display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
+  .stat .label{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);}
+  .stat .value{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:1.35rem;font-variant-numeric:tabular-nums;color:var(--gold);}
+
+  .howto{font-size:0.85rem;color:var(--text-muted);line-height:1.5;max-width:70ch;}
+  .howto summary{
+    cursor:pointer;color:var(--gold);font-size:0.8rem;letter-spacing:0.02em;
+    padding:2px 0;list-style-position:inside;
+  }
+  .howto summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .howto p{margin:6px 0 0;}
+  .howto b{color:var(--rice);font-weight:500;}
+
+  /* layout */
+  .board-layout{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;}
+
+  .board-card{
+    background:var(--panel);border:1px solid var(--border);border-radius:14px;
+    padding:16px;flex:1 1 480px;min-width:280px;
+  }
+  .board-card h2{font-family:"Shippori Mincho",serif;font-size:1.05rem;color:var(--rice);font-weight:500;margin-bottom:12px;}
+
+  .board{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:8px;
+    background:var(--panel-alt);
+    border-radius:10px;
+    padding:10px;
+  }
+  .slot{
+    position:relative;
+    aspect-ratio:1;
+    background:rgba(255,255,255,0.03);
+    border:1px dashed rgba(243,233,210,0.1);
+    border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .slot.dragover{border-color:var(--salmon);background:rgba(242,144,122,0.1);}
+
+  .tile{
+    position:relative;
+    width:88%;height:88%;border-radius:9px;
+    display:flex;align-items:center;justify-content:center;
+    gap:1px;
+    font-size:1.5rem;line-height:1;cursor:grab;user-select:none;
+    box-shadow:var(--tile-shadow);
+    border:1px solid rgba(0,0,0,0.25);
+  }
+  .tile:active{cursor:grabbing;}
+  .tile.spawn-in{animation:pop 0.22s ease-out;}
+  .tile,.cooked-rice{touch-action:none;-webkit-user-select:none;}
+  .drag-ghost{
+    position:fixed;z-index:60;pointer-events:none;
+    transform:translate(-50%,-50%);opacity:0.92;
+    box-shadow:0 10px 22px rgba(0,0,0,0.5);
+  }
+  svg.ic{display:block;width:100%;height:100%;}
+  .tile.tier-raw > svg.ic{width:76%;height:76%;}
+  .tile.tier-mid{outline:2px solid rgba(127,168,76,0.6);outline-offset:-3px;}
+  .tile.tier-final{outline:2px solid var(--gold);outline-offset:-3px;}
+
+  /* composed sushi piece (mid/final items) */
+  .piece{position:relative;width:82%;height:82%;}
+  .p-rice{
+    position:absolute;left:8%;right:8%;bottom:6%;height:44%;
+    border-radius:50% 50% 35% 35% / 70% 70% 30% 30%;
+    box-shadow:0 2px 2px rgba(0,0,0,0.3), inset 0 -3px 0 rgba(0,0,0,0.08);
+  }
+  .p-nori{
+    position:absolute;left:8%;right:8%;bottom:24%;height:14%;
+    border-radius:2px;
+  }
+  .p-toppings{
+    position:absolute;top:2%;left:0;right:0;
+    display:flex;justify-content:center;gap:3%;
+  }
+  .p-top{
+    width:38%;aspect-ratio:1;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:#11161a;
+    box-shadow:0 1px 2px rgba(0,0,0,0.4);
+    border:1.5px solid rgba(243,233,210,0.25);
+    overflow:hidden;
+  }
+  .p-top svg.ic{width:86%;height:86%;}
+  .tile.rare{box-shadow:var(--tile-shadow),0 0 0 2px var(--gold);}
+  .tile.merged{animation:merge 0.32s ease-out;}
+  .tile.bad{animation:shake 0.28s ease-in-out;}
+
+  @keyframes pop{from{transform:scale(0.55);opacity:0;}to{transform:scale(1);opacity:1;}}
+  @keyframes merge{0%{transform:scale(1.28);}100%{transform:scale(1);}}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-4px);}75%{transform:translateX(4px);}}
+  @media (prefers-reduced-motion:reduce){
+    .tile,.tile.merged,.tile.bad{animation:none;}
+  }
+
+  /* hint line — reserves its own height so the board never shifts */
+  .hint{
+    min-height:1.3em;margin:10px 0 0;font-size:0.8rem;color:var(--gold);
+    opacity:0;transition:opacity 0.2s;
+  }
+  .hint.show{opacity:1;}
+
+  /* stove */
+  .pots-title{margin-top:14px;}
+  .stove-row{display:flex;gap:10px;align-items:stretch;}
+  .pots{display:flex;gap:10px;flex:1;min-width:0;}
+  .trash{
+    flex:0 0 76px;
+    background:var(--panel-alt);border:1px dashed rgba(243,233,210,0.22);border-radius:11px;
+    padding:10px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  }
+  .trash svg.ic{width:30px;height:30px;}
+  .trash-label{font-size:0.66rem;color:var(--text-muted);letter-spacing:0.03em;}
+  .trash.dragover{border-color:var(--salmon);border-style:solid;background:rgba(242,144,122,0.12);}
+  .pot{
+    flex:1;min-width:0;
+    background:var(--panel-alt);border:1px solid var(--border);border-radius:11px;
+    padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:7px;
+  }
+  .pot.dragover{border-color:var(--salmon);background:rgba(242,144,122,0.12);}
+  .pot-slot{
+    width:46px;height:40px;
+    border-radius:6px 6px 46% 46% / 6px 6px 34% 34%;
+    background:#11161a;
+    border:2px solid rgba(243,233,210,0.18);
+    border-top-width:3px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .pot-slot svg.ic{width:76%;height:76%;}
+  .pot-slot .cooked-rice,.pot-slot .burnt-rice{
+    width:76%;height:76%;display:flex;align-items:center;justify-content:center;
+  }
+  .pot-slot .cooked-rice svg.ic,.pot-slot .burnt-rice svg.ic{width:100%;height:100%;}
+  .pot.ready .pot-slot{border-color:var(--wasabi);box-shadow:0 0 0 3px rgba(127,168,76,0.18);}
+  .pot.ready .cooked-rice{cursor:grab;}
+  .pot.ready .cooked-rice:active{cursor:grabbing;}
+  .pot.burnt{cursor:pointer;border-color:rgba(242,144,122,0.5);}
+  .pot.burnt .pot-slot{border-color:var(--salmon);background:#1a0f0d;}
+  .pot.burnt .pot-label{color:var(--salmon);}
+  .pot-bar{width:100%;height:4px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden;}
+  .pot-bar i{display:block;height:100%;width:0;background:var(--gold);}
+  .pot.cooking .pot-bar i{animation-name:fill;animation-timing-function:linear;animation-fill-mode:forwards;}
+  /* once it's cooked, a red bar fills TOWARD burning — the closer to full, the worse */
+  .pot.ready .pot-bar i{animation-name:burn;animation-timing-function:linear;animation-fill-mode:forwards;}
+  .pot.burnt .pot-bar i{width:100%;background:var(--salmon);}
+  .pot-label{font-size:0.66rem;color:var(--text-muted);letter-spacing:0.03em;text-align:center;}
+
+  /* last seconds before it burns */
+  .pot.warning{border-color:var(--salmon);animation:warn 0.9s ease-in-out infinite;}
+  .pot.warning .pot-slot{border-color:var(--salmon);}
+  .pot.warning .pot-label{color:var(--salmon);font-weight:700;}
+
+  @keyframes fill{from{width:0;}to{width:100%;}}
+  @keyframes burn{
+    from{width:0;background:var(--wasabi);}
+    45%{background:var(--gold);}
+    to{width:100%;background:#e2503a;}
+  }
+  @keyframes warn{
+    0%,100%{box-shadow:0 0 0 0 rgba(226,80,58,0);}
+    50%{box-shadow:0 0 0 3px rgba(226,80,58,0.35);}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .pot.cooking .pot-bar i{animation:none;width:50%;}
+    .pot.ready .pot-bar i{animation:none;width:60%;background:var(--gold);}
+    .pot.warning{animation:none;}
+  }
+
+  /* sidebar */
+  .sidebar{flex:1 1 260px;min-width:250px;display:flex;flex-direction:column;gap:16px;}
+
+  .panel{
+    background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;
+  }
+  .panel h2{font-family:"Shippori Mincho",serif;font-size:1.05rem;color:var(--rice);font-weight:500;margin-bottom:12px;}
+
+  /* order tickets — the row of chits clipped above the pass */
+  .orders-panel{padding-bottom:14px;}
+  .order-strip{
+    display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;
+    scrollbar-width:thin;
+  }
+  .order{
+    flex:1 1 0;min-width:116px;
+    display:flex;flex-direction:column;align-items:center;gap:7px;
+    background:var(--panel-alt);border-radius:10px;padding:12px 8px 11px;
+    border-top:3px solid var(--salmon);
+    transition:background 0.25s, border-color 0.25s;
+  }
+  .order.done{border-top-color:var(--wasabi);background:rgba(127,168,76,0.15);}
+  .order .glyph{
+    width:60px;height:60px;border-radius:10px;flex:none;
+    background:#161b1f;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .order .info{display:flex;flex-direction:column;gap:2px;min-width:0;align-items:center;text-align:center;}
+  .order .name{font-size:0.8rem;color:var(--text);line-height:1.25;}
+  .order .qty{font-family:"JetBrains Mono",monospace;font-size:0.68rem;color:var(--text-muted);}
+  .order.done .qty{color:var(--wasabi);}
+
+  .recipe-toggle{
+    background:none;border:1px solid var(--border);color:var(--text-muted);
+    border-radius:8px;padding:6px 10px;font-family:"Zen Maru Gothic",sans-serif;font-size:0.78rem;
+    cursor:pointer;width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center;
+  }
+  .recipe-toggle:hover{border-color:var(--salmon);color:var(--rice);}
+  .recipe-book{margin-top:10px;display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto;}
+  .recipe-row{
+    display:flex;align-items:center;gap:9px;font-size:0.78rem;padding:5px 6px;border-radius:6px;
+  }
+  .recipe-row .glyph{
+    width:30px;height:30px;border-radius:6px;flex:none;
+    background:#161b1f;
+    display:flex;align-items:center;justify-content:center;
+    font-size:0.8rem;
+  }
+  .recipe-row.locked{color:var(--text-muted);}
+  .recipe-row.locked .glyph{background:rgba(255,255,255,0.05);color:var(--text-muted);}
+
+  footer.credit{text-align:center;font-size:0.72rem;color:var(--text-muted);padding-top:6px;}
+
+  /* game over overlay */
+  .overlay{
+    position:fixed;inset:0;background:rgba(10,12,13,0.82);
+    display:flex;align-items:center;justify-content:center;z-index:20;
+    opacity:0;pointer-events:none;transition:opacity 0.25s;
+  }
+  .overlay.show{opacity:1;pointer-events:auto;}
+  .overlay-card{
+    background:var(--panel);border:1px solid var(--border);border-radius:16px;
+    padding:28px 30px;text-align:center;max-width:340px;width:90%;
+  }
+  .overlay-card h2{font-family:"Shippori Mincho",serif;color:var(--salmon);font-size:1.4rem;margin-bottom:6px;}
+  .overlay-card p{color:var(--text-muted);font-size:0.85rem;margin:4px 0 18px;}
+  .overlay-stats{display:flex;justify-content:center;gap:26px;margin-bottom:20px;}
+  .overlay-stats .stat .value{color:var(--rice);}
+  .restart-btn{
+    background:var(--salmon);color:#2a1410;border:none;border-radius:9px;
+    font-family:"Zen Maru Gothic",sans-serif;font-weight:700;font-size:0.95rem;
+    padding:10px 22px;cursor:pointer;
+  }
+  .restart-btn:hover{background:#f7a692;}
+  .restart-btn:focus-visible, .recipe-toggle:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+
+  /* phone: keep the board and the stove on one screen, since you have to
+     drag between them */
+  @media (max-width:560px){
+    body{padding:12px 12px 24px;}
+    .wrap{gap:12px;}
+    .brand .kanji{font-size:1.5rem;}
+    .brand .sub{display:none;}
+    .stats{gap:14px;}
+    .topbar{padding-bottom:10px;}
+    .panel,.board-card{padding:12px 11px;}
+    .board{grid-template-columns:repeat(5,1fr);gap:6px;padding:7px;}
+    .board-card h2,.panel h2{font-size:0.95rem;margin-bottom:9px;}
+    .pots-title{margin-top:11px;}
+    .order{min-width:96px;padding:9px 6px 8px;}
+    .order .glyph{width:46px;height:46px;}
+    .order .name{font-size:0.72rem;}
+    .pot{padding:8px 6px;gap:5px;}
+    .trash{flex-basis:62px;padding:8px 6px;}
+    .trash svg.ic{width:24px;height:24px;}
+    .board-layout{gap:12px;}
+  }
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="kanji">板前 <span style="font-size:1rem;color:var(--text-muted);font-family:'Zen Maru Gothic',sans-serif;font-weight:400;">Itamae</span></div>
+      <div class="sub">malzeme birleştirme mutfağı — sipariş prototipi</div>
+    </div>
+    <div class="stats">
+      <div class="stat"><span class="label">Puan</span><span class="value" id="scoreVal">0</span></div>
+      <div class="stat"><span class="label">Tamamlanan</span><span class="value" id="doneVal">0</span></div>
+    </div>
+  </div>
+
+  <details class="howto" id="howto">
+    <summary>Nasıl oynanır?</summary>
+    <p>
+      Çiğ pirinci <b>ocaktaki tencereye</b> sürükle; haşlandıktan sonra kırmızı çubuk dolarken al, dolarsa
+      <b>yanar</b> ve tencereyi tıklayıp temizlemen gerekir. Tezgahtaki <b>farklı</b> iki malzemeyi üst üste
+      bırakırsan birleşirler — tarifi olan gerçek bir sushi, olmayan senin keşfin olur. Boş karelere sürükleyip
+      tezgahı dizebilir, işine yaramayanı <b>çöpe</b> atabilirsin. Tezgah dolarsa servis biter.
+    </p>
+  </details>
+
+  <div class="panel orders-panel">
+    <h2>Siparişler</h2>
+    <div class="order-strip" id="orderList"></div>
+  </div>
+
+  <div class="board-layout">
+    <div class="board-card">
+      <h2>Tezgah</h2>
+      <div class="board" id="board"></div>
+      <p class="hint" id="hint"></p>
+      <h2 class="pots-title">Ocak</h2>
+      <div class="stove-row">
+        <div class="pots" id="pots"></div>
+        <div class="trash" id="trash" title="İstemediğin malzemeyi buraya sürükle">
+          <svg class="ic" viewBox="0 0 32 32" aria-hidden="true">
+            <path d="M8 11h16l-1.6 15.2A2 2 0 0 1 20.4 28h-8.8a2 2 0 0 1-2-1.8z" fill="#3b464d"/>
+            <path d="M13 15v9M16 15v9M19 15v9" stroke="#6e7d86" stroke-width="1.8" stroke-linecap="round"/>
+            <rect x="6" y="8" width="20" height="3.4" rx="1.7" fill="#56656e"/>
+            <path d="M13 8V6.2A1.2 1.2 0 0 1 14.2 5h3.6A1.2 1.2 0 0 1 19 6.2V8" fill="none"
+              stroke="#56656e" stroke-width="2"/>
+          </svg>
+          <span class="trash-label">çöp</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <div class="panel">
+        <button class="recipe-toggle" id="recipeToggle">
+          <span class="rt-label">Tarif Defteri</span>
+          <span id="recipeChevron">▾</span>
+        </button>
+        <div class="recipe-book" id="recipeBook" style="display:none;"></div>
+      </div>
+
+      <footer class="credit">Itamae — sort/merge mutfak prototipi</footer>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="overlay-card">
+    <h2>Servis Doldu</h2>
+    <p>Tezgahta artık boş yer yok. Bugünlük bu kadar, ustabaşı.</p>
+    <div class="overlay-stats">
+      <div class="stat"><span class="label">Puan</span><span class="value" id="finalScore">0</span></div>
+      <div class="stat"><span class="label">Sipariş</span><span class="value" id="finalDone">0</span></div>
+      <div class="stat"><span class="label">Tarif</span><span class="value" id="finalRecipes">0</span></div>
+    </div>
+    <button class="restart-btn" id="restartBtn">Yeniden Aç</button>
+  </div>
+</div>
+
+<script>
+(function(){
+
+  // ---- item definitions -------------------------------------------------
+  // Hand-drawn flat icons — external images can't load inside an artifact,
+  // and drawn shapes stay legible at 40px where a photo turns to mush.
+  const svg = body => `<svg class="ic" viewBox="0 0 32 32" aria-hidden="true">${body}</svg>`;
+
+  const ICONS = {
+    PR_RAW: svg(`<g fill="#e0cfa2">
+      <ellipse cx="10" cy="12" rx="2.8" ry="4.6" transform="rotate(-28 10 12)"/>
+      <ellipse cx="20" cy="11" rx="2.8" ry="4.6" transform="rotate(22 20 11)"/>
+      <ellipse cx="8" cy="21" rx="2.8" ry="4.6" transform="rotate(38 8 21)"/>
+      <ellipse cx="16" cy="18" rx="2.8" ry="4.6" transform="rotate(-8 16 18)"/>
+      <ellipse cx="24" cy="20" rx="2.8" ry="4.6" transform="rotate(-42 24 20)"/></g>`),
+
+    PR: svg(`<path d="M5 23c0-6.5 5-11 11-11s11 4.5 11 11z" fill="#fdf7ea"/>
+      <g fill="#ffffff" opacity=".9">
+        <ellipse cx="12" cy="18" rx="2.2" ry="3.4" transform="rotate(-20 12 18)"/>
+        <ellipse cx="19" cy="17" rx="2.2" ry="3.4" transform="rotate(18 19 17)"/>
+        <ellipse cx="16" cy="21" rx="2.2" ry="3.4"/></g>
+      <rect x="3" y="23" width="26" height="4" rx="2" fill="#e5d8bd"/>`),
+
+    NR: svg(`<rect x="5" y="6" width="22" height="20" rx="2.5" fill="#15291e"/>
+      <path d="M8.5 11h15M8.5 16h15M8.5 21h11" stroke="#2c4b36" stroke-width="1.4" stroke-linecap="round"/>
+      <rect x="5" y="6" width="22" height="20" rx="2.5" fill="none" stroke="#3d6349" stroke-width="1"/>`),
+
+    SM: svg(`<rect x="3" y="9" width="26" height="14" rx="5" fill="#f4886a"/>
+      <path d="M6 13.5c6 1.2 14 1.2 20 0M6 18.5c6 1.2 14 1.2 20 0" stroke="#ffd6c4"
+        stroke-width="2.2" stroke-linecap="round" fill="none"/>`),
+
+    TN: svg(`<rect x="3" y="9" width="26" height="14" rx="5" fill="#b5322a"/>
+      <path d="M7 14h18M7 18h18" stroke="#8a1f18" stroke-width="1.8" stroke-linecap="round"/>`),
+
+    EB: svg(`<path d="M23 9c-7.5 0-12.5 4.2-12.5 10.2 0 3.6 2.6 5.8 5.6 5.8" fill="none"
+        stroke="#f2a184" stroke-width="6.5" stroke-linecap="round"/>
+      <path d="M14 13.5l2.5 3M11.8 18l3 2.2" stroke="#dd7455" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M23.5 6.5l4.5 3-4.5 3z" fill="#dd7455"/>`),
+
+    AV: svg(`<ellipse cx="16" cy="16.5" rx="9" ry="11" fill="#7aa83c"/>
+      <ellipse cx="16" cy="16.5" rx="6.4" ry="8.4" fill="#d3e6a2"/>
+      <ellipse cx="16" cy="16.5" rx="3.3" ry="4" fill="#8b5a2b"/>`),
+
+    SL: svg(`<circle cx="16" cy="16" r="10" fill="#96c455"/>
+      <circle cx="16" cy="16" r="7.4" fill="#e8f4cd"/>
+      <g fill="#a8ce6c">
+        <ellipse cx="16" cy="11.6" rx="1.5" ry="2"/><ellipse cx="19.6" cy="16" rx="2" ry="1.5"/>
+        <ellipse cx="16" cy="20.4" rx="1.5" ry="2"/><ellipse cx="12.4" cy="16" rx="2" ry="1.5"/></g>`),
+
+    CR: svg(`<path d="M16 6l10 4.5v11L16 26 6 21.5v-11z" fill="#f2e7c9"/>
+      <path d="M16 6l10 4.5L16 15 6 10.5z" fill="#fdf8e8"/>
+      <path d="M16 15v11l10-4.5v-11z" fill="#e0d2ad"/>`),
+
+    TB: svg(`<g fill="#ee8c26">
+        <circle cx="11" cy="13" r="4.4"/><circle cx="20.5" cy="12" r="4.4"/>
+        <circle cx="16" cy="20" r="4.4"/><circle cx="23" cy="20.5" r="4"/><circle cx="8.5" cy="21" r="4"/></g>
+      <g fill="#ffd8a0" opacity=".85">
+        <circle cx="9.6" cy="11.6" r="1.3"/><circle cx="19.1" cy="10.6" r="1.3"/>
+        <circle cx="14.6" cy="18.6" r="1.3"/></g>`),
+
+    WS: svg(`<path d="M6.5 24c0-7.5 4.2-13.5 9.5-13.5S25.5 16.5 25.5 24z" fill="#74ad36"/>
+      <path d="M12 22c.2-4.2 1.8-7.2 3.6-8.6" stroke="#a9d76a" stroke-width="2.2"
+        fill="none" stroke-linecap="round"/>
+      <rect x="4" y="24" width="24" height="3" rx="1.5" fill="#4d7a22"/>`),
+
+    UN: svg(`<rect x="3" y="10" width="26" height="12" rx="3" fill="#6b4122"/>
+      <rect x="3" y="10" width="26" height="4.5" rx="2.2" fill="#8d5c2f" opacity=".75"/>
+      <path d="M10 10.5v11M16 10.5v11M22 10.5v11" stroke="#46280f" stroke-width="1.7"/>`),
+
+    UNI: svg(`<rect x="4" y="17" width="24" height="9" rx="2" fill="#15291e"/>
+      <g fill="#ef9f3a">
+        <ellipse cx="10.5" cy="14.5" rx="4" ry="6"/><ellipse cx="16" cy="12.5" rx="4" ry="6.6"/>
+        <ellipse cx="21.5" cy="14.5" rx="4" ry="6"/></g>
+      <g fill="#ffc987" opacity=".7">
+        <ellipse cx="9.6" cy="12.5" rx="1.3" ry="2.2"/><ellipse cx="15.2" cy="10.4" rx="1.3" ry="2.2"/></g>`),
+
+    BURNT: svg(`<path d="M5 23c0-6.5 5-11 11-11s11 4.5 11 11z" fill="#2e2622"/>
+      <rect x="3" y="23" width="26" height="4" rx="2" fill="#1d1715"/>
+      <path d="M13 19c0-2.5 1.5-4 3-5.5-.5 2 2.5 2.5 2.5 5A2.8 2.8 0 0 1 13 19z" fill="#f2907a"/>`),
+  };
+
+  const ITEMS = {
+    PR_RAW: {name:"Çiğ Pirinç", icon:ICONS.PR_RAW, bg:"#c9b98f", tier:"raw"},
+    PR:  {name:"Haşlanmış Pirinç", icon:ICONS.PR, bg:"#f3e9d2", tier:"raw"},
+    NR:  {name:"Nori", icon:ICONS.NR, bg:"#1f3a2e", tier:"raw"},
+    SM:  {name:"Somon", icon:ICONS.SM, bg:"#f2907a", tier:"raw"},
+    TN:  {name:"Ton Balığı", icon:ICONS.TN, bg:"#c0392b", tier:"raw"},
+    EB:  {name:"Ebi (Karides)", icon:ICONS.EB, bg:"#e67e52", tier:"raw"},
+    AV:  {name:"Avokado", icon:ICONS.AV, bg:"#7fa84c", tier:"raw"},
+    SL:  {name:"Salatalık", icon:ICONS.SL, bg:"#a8c97f", tier:"raw"},
+    CR:  {name:"Cream Cheese", icon:ICONS.CR, bg:"#ede1b8", tier:"raw"},
+    TB:  {name:"Tarama", icon:ICONS.TB, bg:"#e8a33d", tier:"raw"},
+    WS:  {name:"Wasabi", icon:ICONS.WS, bg:"#6b9b37", tier:"raw"},
+    UN:  {name:"Unagi", icon:ICONS.UN, bg:"#6b4a32", tier:"raw"},
+    UNI: {name:"Uni", icon:ICONS.UNI, bg:"#ef9f3a", tier:"raw"},
+
+    BASE:        {name:"Temel Rulo", tier:"mid"},
+    SPICY_RICE:  {name:"Baharatlı Pirinç", tier:"mid"},
+    AVO_WRAP:    {name:"Avokado Sarımı", tier:"mid"},
+    KAPPA_BASE:  {name:"Kappa Tabanı", tier:"mid"},
+    SPICY_BASE:  {name:"Spicy Rulo Tabanı", tier:"mid"},
+    CREAM_ROLL:  {name:"Kremalı Rulo", tier:"mid"},
+
+    SOMON_AVO:      {name:"Somon Avokado Roll", tier:"final"},
+    EBI_KAPPA:      {name:"Ebi Kappa Maki", tier:"final"},
+    TON_MAKI:       {name:"Ton Maki", tier:"final"},
+    SPICY_SOMON:    {name:"Spicy Somon Roll", tier:"final"},
+    TARAMA_GUNKAN:  {name:"Tarama Gunkan", tier:"final"},
+    UNAGI_AVO:      {name:"Unagi Avokado Roll", tier:"final"},
+    UNI_NIGIRI:     {name:"Uni Nigiri", tier:"final", rare:true},
+    PHILLY:         {name:"Philadelphia Roll", tier:"final"},
+  };
+
+  const RAW_WEIGHTS = [
+    ["PR_RAW",11],["NR",10],["SL",8],["AV",7],
+    ["SM",6],["TN",5],["EB",5],["CR",4],["WS",4],
+    ["TB",3],["UN",2],["UNI",1],
+  ];
+
+  function combKey(a,b){ return [a,b].sort().join("+"); }
+
+  const COMBOS = {};
+  function addCombo(a,b,result){ COMBOS[combKey(a,b)] = result; }
+  addCombo("NR","PR","BASE");
+  addCombo("PR","WS","SPICY_RICE");
+  addCombo("AV","BASE","AVO_WRAP");
+  addCombo("BASE","SL","KAPPA_BASE");
+  addCombo("NR","SPICY_RICE","SPICY_BASE");
+  addCombo("BASE","CR","CREAM_ROLL");
+
+  addCombo("AVO_WRAP","SM","SOMON_AVO");
+  addCombo("EB","KAPPA_BASE","EBI_KAPPA");
+  addCombo("BASE","TN","TON_MAKI");
+  addCombo("SM","SPICY_BASE","SPICY_SOMON");
+  addCombo("BASE","TB","TARAMA_GUNKAN");
+  addCombo("AVO_WRAP","UN","UNAGI_AVO");
+  addCombo("SPICY_RICE","UNI","UNI_NIGIRI");
+  addCombo("CREAM_ROLL","SM","PHILLY");
+
+  const COMPONENTS = {
+    BASE:        ["PR","NR"],
+    SPICY_RICE:  ["PR","WS"],
+    AVO_WRAP:    ["PR","NR","AV"],
+    KAPPA_BASE:  ["PR","NR","SL"],
+    SPICY_BASE:  ["PR","WS","NR"],
+    CREAM_ROLL:  ["PR","NR","CR"],
+
+    SOMON_AVO:      ["PR","NR","AV","SM"],
+    EBI_KAPPA:      ["PR","NR","SL","EB"],
+    TON_MAKI:       ["PR","NR","TN"],
+    SPICY_SOMON:    ["PR","WS","NR","SM"],
+    TARAMA_GUNKAN:  ["PR","NR","TB"],
+    UNAGI_AVO:      ["PR","NR","AV","UN"],
+    UNI_NIGIRI:     ["PR","WS","UNI"],
+    PHILLY:         ["PR","NR","CR","SM"],
+  };
+
+  const FINAL_IDS = Object.keys(ITEMS).filter(id=>ITEMS[id].tier==="final");
+  const DISCOVERABLE_IDS = Object.keys(ITEMS).filter(id=>ITEMS[id].tier!=="raw");
+
+  // ---- state --------------------------------------------------------------
+  const COLS=6, ROWS=5, SLOT_COUNT=COLS*ROWS;
+  let board = new Array(SLOT_COUNT).fill(null);
+  let score=0, ordersDone=0, discovered=new Set();
+  let orders=[]; // {id}
+  let spawnDelay=2400, spawnTimer=null;
+  let drag=null; // {from:"board"|"pot", index}
+  const COOK_MS=4000, BURN_MS=13000, BURN_WARN_MS=8000, ORDER_COUNT=5;
+  let pots=[{state:"empty"},{state:"empty"},{state:"empty"}];
+  let hintTimer=null;
+  let mixIds=[]; // player's own freeform discoveries, in the order they were found
+
+  // An item is identified by the SET of raw ingredients inside it, never by the
+  // order they were added. So every path to the same ingredients lands on the
+  // same item — which is what lets a named recipe be reached "the player's way".
+  const CANONICAL={}; // sorted ingredient key -> item id
+  Object.keys(COMPONENTS).forEach(id=>{
+    CANONICAL[[...new Set(COMPONENTS[id])].sort().join("+")]=id;
+  });
+
+  function componentsOf(id){ return COMPONENTS[id] || [id]; }
+
+  function combineItems(a,b){
+    const curated=COMBOS[combKey(a,b)];
+    if(curated) return curated;
+    if(ITEMS[a].tier==="final" || ITEMS[b].tier==="final") return null;
+
+    const comps=[...new Set([...componentsOf(a), ...componentsOf(b)])].sort();
+    const compKey=comps.join("+");
+    if(CANONICAL[compKey]) return CANONICAL[compKey];
+
+    // nothing named uses these ingredients — the player just invented something
+    const id="MIX_"+compKey;
+    ITEMS[id]={ name:comps.map(c=>ITEMS[c].name).join(" + "), tier:"mid", mix:true };
+    COMPONENTS[id]=comps;
+    CANONICAL[compKey]=id;
+    mixIds.push(id);
+    return id;
+  }
+
+  function clearMixes(){
+    mixIds.forEach(id=>{
+      delete CANONICAL[id.slice(4)];
+      delete COMPONENTS[id];
+      delete ITEMS[id];
+    });
+    mixIds=[];
+  }
+
+  const boardEl=document.getElementById("board");
+  const potsEl=document.getElementById("pots");
+  const hintEl=document.getElementById("hint");
+  const orderListEl=document.getElementById("orderList");
+  const recipeBookEl=document.getElementById("recipeBook");
+  const recipeToggle=document.getElementById("recipeToggle");
+  const recipeChevron=document.getElementById("recipeChevron");
+
+
+  // ---- board rendering ------------------------------------------------
+  function buildSlots(){
+    boardEl.innerHTML="";
+    for(let i=0;i<SLOT_COUNT;i++){
+      const slot=document.createElement("div");
+      slot.className="slot";
+      slot.dataset.index=i;
+      boardEl.appendChild(slot);
+    }
+  }
+
+  // ---- dragging ---------------------------------------------------------
+  // Pointer events rather than HTML5 drag-and-drop: the latter does nothing
+  // on touch screens, so the game would be unplayable on a phone.
+  let dragGhost=null, dragOverEl=null;
+
+  function beginDrag(source, el, ev){
+    if(ev.button>0) return;
+    ev.preventDefault();
+    drag=source;
+    const r=el.getBoundingClientRect();
+    dragGhost=el.cloneNode(true);
+    dragGhost.classList.add("drag-ghost");
+    dragGhost.style.width=r.width+"px";
+    dragGhost.style.height=r.height+"px";
+    document.body.appendChild(dragGhost);
+    moveGhost(ev.clientX, ev.clientY);
+    window.addEventListener("pointermove", onDragMove, {passive:false});
+    window.addEventListener("pointerup", onDragEnd);
+    window.addEventListener("pointercancel", onDragEnd);
+  }
+
+  function moveGhost(x,y){
+    dragGhost.style.left=x+"px";
+    dragGhost.style.top=y+"px";
+  }
+
+  function dropTargetAt(x,y){
+    const el=document.elementFromPoint(x,y);
+    return el ? el.closest(".slot, .pot, .trash") : null;
+  }
+
+  function setDragOver(el){
+    if(el===dragOverEl) return;
+    if(dragOverEl) dragOverEl.classList.remove("dragover");
+    dragOverEl=el;
+    if(dragOverEl) dragOverEl.classList.add("dragover");
+  }
+
+  function onDragMove(ev){
+    ev.preventDefault();
+    moveGhost(ev.clientX, ev.clientY);
+    setDragOver(dropTargetAt(ev.clientX, ev.clientY));
+  }
+
+  function onDragEnd(ev){
+    window.removeEventListener("pointermove", onDragMove);
+    window.removeEventListener("pointerup", onDragEnd);
+    window.removeEventListener("pointercancel", onDragEnd);
+    if(dragGhost){ dragGhost.remove(); dragGhost=null; }
+    setDragOver(null);
+
+    const target=dropTargetAt(ev.clientX, ev.clientY);
+    if(!target){ drag=null; return; }
+    if(target.classList.contains("slot"))      handleDrop(parseInt(target.dataset.index,10));
+    else if(target.classList.contains("pot"))  dropOnPot(parseInt(target.dataset.pot,10));
+    else if(target.classList.contains("trash")) dropInTrash();
+    else drag=null;
+  }
+
+  // ---- trash ------------------------------------------------------------
+  function dropInTrash(){
+    const d=drag; drag=null;
+    if(!d) return;
+
+    if(d.from==="pot"){
+      if(pots[d.index].state==="empty") return;
+      emptyPot(d.index);
+      hint("Tencere boşaltıldı.");
+      return;
+    }
+    const id=board[d.index];
+    if(!id) return;
+    board[d.index]=null;
+    renderBoard({[d.index]:null});
+    hint(`${ITEMS[id].name} çöpe atıldı.`);
+  }
+
+  function hint(msg){
+    hintEl.textContent=msg;
+    hintEl.classList.add("show");
+    clearTimeout(hintTimer);
+    hintTimer=setTimeout(()=>hintEl.classList.remove("show"), 2400);
+  }
+
+  // ---- stove ------------------------------------------------------------
+  function buildPots(){
+    potsEl.innerHTML="";
+    pots.forEach((_,i)=>{
+      const el=document.createElement("div");
+      el.dataset.pot=i;
+      el.addEventListener("click", ()=>{
+        if(pots[i].state!=="burnt") return;
+        emptyPot(i);
+        hint("Tencere temizlendi.");
+      });
+      potsEl.appendChild(el);
+      renderPot(i);
+    });
+  }
+
+  function renderPot(i){
+    const p=pots[i], el=potsEl.children[i];
+    el.className="pot "+p.state;
+    const inside =
+      p.state==="ready"   ? `<span class="cooked-rice" title="${ITEMS.PR.name}">${ITEMS.PR.icon}</span>` :
+      p.state==="cooking" ? ITEMS.PR_RAW.icon :
+      p.state==="burnt"   ? `<span class="burnt-rice">${ICONS.BURNT}</span>` : "";
+    const label =
+      p.state==="ready"   ? "hazır — çabuk al" :
+      p.state==="cooking" ? "haşlanıyor…" :
+      p.state==="burnt"   ? "yandı — tıkla" : "boş tencere";
+    el.innerHTML =
+      `<div class="pot-slot">${inside}</div>` +
+      `<div class="pot-bar"><i${p.state==="cooking"?` style="animation-duration:${COOK_MS}ms"`:""}></i></div>` +
+      `<span class="pot-label">${label}</span>`;
+    if(p.state==="ready"){
+      const rice=el.querySelector(".cooked-rice");
+      rice.addEventListener("pointerdown", ev=>beginDrag({from:"pot", index:i}, rice, ev));
+    }
+  }
+
+  function dropOnPot(potIndex){
+    const d=drag; drag=null;
+    if(!d || d.from!=="board") return;
+    if(pots[potIndex].state!=="empty"){ hint("Bu tencere şu an dolu."); return; }
+    if(board[d.index]!=="PR_RAW"){ hint("Tencereye sadece çiğ pirinç girer."); return; }
+
+    board[d.index]=null;
+    renderBoard({[d.index]:null});
+    pots[potIndex]={state:"cooking"};
+    renderPot(potIndex);
+    pots[potIndex].timer=setTimeout(()=>{
+      pots[potIndex]={state:"ready"};
+      renderPot(potIndex);
+
+      // last seconds before it burns: flag the pot in place, so the burn bar
+      // keeps running instead of restarting from a re-render
+      pots[potIndex].warnTimer=setTimeout(()=>{
+        if(pots[potIndex].state!=="ready") return;
+        const el=potsEl.children[potIndex];
+        el.classList.add("warning");
+        const label=el.querySelector(".pot-label");
+        if(label) label.textContent="yanmak üzere!";
+        hint("Pirinç yanmak üzere — tencereden al!");
+      }, BURN_WARN_MS);
+
+      pots[potIndex].timer=setTimeout(()=>{
+        pots[potIndex]={state:"burnt"};
+        renderPot(potIndex);
+        hint("Pirinç yandı! Tencereye tıklayıp temizle.");
+      }, BURN_MS);
+    }, COOK_MS);
+  }
+
+  function stopPotTimers(p){ clearTimeout(p.timer); clearTimeout(p.warnTimer); }
+
+  function emptyPot(i){
+    stopPotTimers(pots[i]);
+    pots[i]={state:"empty"};
+    renderPot(i);
+  }
+
+  function clearPots(){
+    pots.forEach(stopPotTimers);
+    pots=[{state:"empty"},{state:"empty"},{state:"empty"}];
+  }
+
+  function pieceHTML(id){
+    const comps=COMPONENTS[id]||[];
+    const hasRice=comps.includes("PR");
+    const hasNori=comps.includes("NR");
+    const toppings=comps.filter(c=>c!=="PR"&&c!=="NR");
+    let html='<div class="piece">';
+    if(hasRice) html+=`<div class="p-rice" style="background:${ITEMS.PR.bg}"></div>`;
+    if(hasNori) html+=`<div class="p-nori" style="background:${ITEMS.NR.bg}"></div>`;
+    if(toppings.length){
+      html+='<div class="p-toppings">';
+      toppings.slice(0,3).forEach(t=>{
+        html+=`<div class="p-top" style="border-color:${ITEMS[t].bg}80">${ITEMS[t].icon}</div>`;
+      });
+      html+='</div>';
+    }
+    html+='</div>';
+    return html;
+  }
+
+  function tileHTML(id){
+    const it=ITEMS[id];
+    const cls=["tile", it.tier==="mid"?"tier-mid":"", it.tier==="final"?"tier-final":"", it.rare?"rare":""].join(" ").trim();
+    if(it.tier==="raw"){
+      return `<div class="${cls} tier-raw" style="background:${it.bg}26;border-color:${it.bg}59;" title="${it.name}">${it.icon}</div>`;
+    }
+    return `<div class="${cls}" style="background:var(--panel-alt);" title="${it.name}">${pieceHTML(id)}</div>`;
+  }
+
+  // renderBoard(changes): changes is an optional {index: animClass} map.
+  // Only the listed indices are rebuilt — untouched slots keep their DOM
+  // node (and don't replay their spawn/merge animation). Omit `changes`
+  // only for the very first, silent render of the whole board.
+  function renderBoard(changes){
+    const slots=boardEl.children;
+    const indices = changes ? Object.keys(changes).map(Number) : [...Array(SLOT_COUNT).keys()];
+    indices.forEach(i=>{
+      const id=board[i];
+      slots[i].innerHTML = id ? tileHTML(id) : "";
+      if(id){
+        const tileEl=slots[i].firstElementChild;
+        tileEl.addEventListener("pointerdown", ev=>beginDrag({from:"board", index:i}, tileEl, ev));
+        const animCls = changes && changes[i];
+        if(animCls) tileEl.classList.add(animCls);
+      }
+    });
+  }
+
+  function shakeSlots(indices){
+    indices.forEach(i=>{
+      const tileEl=boardEl.children[i] && boardEl.children[i].firstElementChild;
+      if(!tileEl) return;
+      tileEl.classList.remove("bad");
+      void tileEl.offsetWidth; // restart animation
+      tileEl.classList.add("bad");
+      setTimeout(()=>tileEl.classList.remove("bad"), 300);
+    });
+  }
+
+  function applyMerge(targetIndex, result){
+    const firstTime=!discovered.has(result);
+    discovered.add(result);
+    board[targetIndex]=result;
+    renderBoard({[targetIndex]:"merged"});
+    updateRecipeBook();
+    if(firstTime){ addScore(10); }
+    checkOrders(targetIndex, result);
+  }
+
+  function handleDrop(targetIndex){
+    const d=drag; drag=null;
+    if(!d) return;
+
+    if(d.from==="pot") return dropRiceFromPot(d.index, targetIndex);
+    if(d.index===targetIndex) return;
+
+    const srcIndex=d.index;
+    const a=board[srcIndex], b=board[targetIndex];
+    if(!a) return;
+    if(!b){ // empty slot — plain move, so the board can be arranged freely
+      board[targetIndex]=a;
+      board[srcIndex]=null;
+      renderBoard({[srcIndex]:null, [targetIndex]:null});
+      return;
+    }
+    if(a==="PR_RAW" || b==="PR_RAW"){
+      hint("Çiğ pirinci önce ocakta haşlaman gerek.");
+      shakeSlots([srcIndex, targetIndex]);
+      return;
+    }
+    if(a===b){ shakeSlots([srcIndex, targetIndex]); return; } // merge-different game, not merge-same
+
+    const result=combineItems(a,b);
+    if(result){
+      board[srcIndex]=null;
+      renderBoard({[srcIndex]:null});
+      applyMerge(targetIndex, result);
+    } else {
+      // no recipe for this pair — leave both tiles exactly where they are
+      // and shake them, so a failed attempt reads clearly as failed
+      shakeSlots([srcIndex, targetIndex]);
+    }
+  }
+
+  function dropRiceFromPot(potIndex, targetIndex){
+    if(pots[potIndex].state!=="ready") return;
+    const target=board[targetIndex];
+
+    if(!target){
+      board[targetIndex]="PR";
+      renderBoard({[targetIndex]:"spawn-in"});
+      emptyPot(potIndex);
+      return;
+    }
+    if(target==="PR" || target==="PR_RAW"){ shakeSlots([targetIndex]); return; }
+
+    const result=combineItems("PR", target);
+    if(result){
+      emptyPot(potIndex);
+      applyMerge(targetIndex, result);
+    } else {
+      shakeSlots([targetIndex]);
+    }
+  }
+
+  // ---- spawning ---------------------------------------------------------
+  function weightedRawId(){
+    const total=RAW_WEIGHTS.reduce((s,[,w])=>s+w,0);
+    let r=Math.random()*total;
+    for(const [id,w] of RAW_WEIGHTS){ r-=w; if(r<=0) return id; }
+    return RAW_WEIGHTS[0][0];
+  }
+
+  function emptySlots(){
+    const out=[];
+    for(let i=0;i<SLOT_COUNT;i++) if(!board[i]) out.push(i);
+    return out;
+  }
+
+  // Pure random spawning can starve an order forever (cheese never showing up
+  // while an order needs it). So most spawns are drawn from what the open
+  // orders still lack — a board should always be finishable.
+  function spawnId(){
+    const needed=new Set();
+    orders.forEach(o=>{
+      if(o.done) return;
+      componentsOf(o.id).forEach(c=>needed.add(c==="PR" ? "PR_RAW" : c));
+    });
+    if(needed.size){
+      const have=new Set();
+      board.forEach(id=>{
+        if(id) componentsOf(id).forEach(c=>have.add(c==="PR" ? "PR_RAW" : c));
+      });
+      pots.forEach(p=>{ if(p.state!=="empty") have.add("PR_RAW"); });
+
+      const missing=[...needed].filter(c=>!have.has(c));
+      if(missing.length && Math.random()<0.7){
+        return missing[Math.floor(Math.random()*missing.length)];
+      }
+    }
+    return weightedRawId();
+  }
+
+  function spawnOne(){
+    const empties=emptySlots();
+    if(empties.length===0){ gameOver(); return; }
+    const idx=empties[Math.floor(Math.random()*empties.length)];
+    board[idx]=spawnId();
+    renderBoard({[idx]:"spawn-in"});
+    scheduleSpawn();
+  }
+
+  function scheduleSpawn(){
+    clearTimeout(spawnTimer);
+    spawnTimer=setTimeout(spawnOne, spawnDelay);
+  }
+
+  // ---- orders -------------------------------------------------------------
+  function pickNewOrder(){
+    const active=new Set(orders.map(o=>o.id));
+    const pool=FINAL_IDS.filter(id=>!active.has(id));
+    const source = pool.length? pool : FINAL_IDS;
+    // rare item shows up less often
+    const weighted=source.flatMap(id=> ITEMS[id].rare ? [id] : [id,id,id]);
+    return weighted[Math.floor(Math.random()*weighted.length)];
+  }
+
+  function renderOrders(){
+    orderListEl.innerHTML="";
+    orders.forEach(o=>{
+      const it=ITEMS[o.id];
+      const row=document.createElement("div");
+      row.className="order"+(o.done?" done":"");
+      row.innerHTML=`
+        <div class="glyph">${pieceHTML(o.id)}</div>
+        <div class="info">
+          <span class="name">${it.name}</span>
+          <span class="qty">${o.done? "hazır ✓" : "1x sipariş"}</span>
+        </div>`;
+      orderListEl.appendChild(row);
+    });
+  }
+
+  function checkOrders(slotIndex, resultId){
+    const match=orders.find(o=>o.id===resultId && !o.done);
+    if(!match) return;
+    match.done=true;
+    renderOrders();
+    setTimeout(()=>{
+      board[slotIndex]=null;
+      renderBoard({[slotIndex]:null});
+      addScore(ITEMS[resultId].rare?250:100);
+      ordersDone++;
+      document.getElementById("doneVal").textContent=ordersDone;
+      orders=orders.filter(o=>o!==match);
+      orders.push({id:pickNewOrder(), done:false});
+      renderOrders();
+      spawnDelay=Math.max(900, spawnDelay-60);
+    }, 420);
+  }
+
+  // ---- recipe book --------------------------------------------------------
+  function updateRecipeBook(){
+    recipeBookEl.innerHTML="";
+    DISCOVERABLE_IDS.forEach(id=>{
+      const it=ITEMS[id];
+      const row=document.createElement("div");
+      const isKnown=discovered.has(id);
+      row.className="recipe-row"+(isKnown?"":" locked");
+      row.innerHTML = isKnown
+        ? `<div class="glyph">${pieceHTML(id)}</div><span>${it.name}</span>`
+        : `<div class="glyph locked-mark">?</div><span>??? (${it.tier==="mid"?"ara ürün":"tarif"})</span>`;
+      recipeBookEl.appendChild(row);
+    });
+    if(mixIds.length){
+      const divider=document.createElement("div");
+      divider.style.cssText="font-size:0.7rem;color:var(--text-muted);margin:6px 0 2px;text-transform:uppercase;letter-spacing:0.06em;";
+      divider.textContent="Kendi keşiflerin";
+      recipeBookEl.appendChild(divider);
+      mixIds.forEach(id=>{
+        const row=document.createElement("div");
+        row.className="recipe-row";
+        row.innerHTML=`<div class="glyph">${pieceHTML(id)}</div><span>${ITEMS[id].name}</span>`;
+        recipeBookEl.appendChild(row);
+      });
+    }
+    recipeToggle.querySelector(".rt-label").textContent =
+      `Tarif Defteri (${discovered.size}/${DISCOVERABLE_IDS.length} tarif${mixIds.length? ` · ${mixIds.length} keşif`:""})`;
+  }
+
+  recipeToggle.addEventListener("click", ()=>{
+    const open = recipeBookEl.style.display!=="none";
+    recipeBookEl.style.display = open? "none":"flex";
+    recipeChevron.textContent = open? "▾":"▴";
+  });
+
+  // ---- score / game over --------------------------------------------------
+  function addScore(n){
+    score+=n;
+    document.getElementById("scoreVal").textContent=score;
+  }
+
+  function gameOver(){
+    clearTimeout(spawnTimer);
+    pots.forEach(stopPotTimers);
+    document.getElementById("finalScore").textContent=score;
+    document.getElementById("finalDone").textContent=ordersDone;
+    document.getElementById("finalRecipes").textContent=discovered.size;
+    document.getElementById("overlay").classList.add("show");
+  }
+
+  document.getElementById("restartBtn").addEventListener("click", ()=>{
+    document.getElementById("overlay").classList.remove("show");
+    startGame();
+  });
+
+  // ---- boot -----------------------------------------------------------
+  function startGame(){
+    board=new Array(SLOT_COUNT).fill(null);
+    score=0; ordersDone=0; spawnDelay=2400; discovered=new Set();
+    clearMixes();
+    clearPots();
+    drag=null;
+    hintEl.classList.remove("show");
+    document.getElementById("scoreVal").textContent=0;
+    document.getElementById("doneVal").textContent=0;
+    orders=[];
+    for(let i=0;i<ORDER_COUNT;i++) orders.push({id:pickNewOrder(), done:false});
+    buildSlots();
+    buildPots();
+    renderBoard();
+    renderOrders();
+    updateRecipeBook();
+    // fixed opening hand: enough rice and nori to cook and roll straight away
+    ["PR_RAW","PR_RAW","PR_RAW","NR","NR"].forEach(id=>{
+      const empties=emptySlots();
+      board[empties[Math.floor(Math.random()*empties.length)]]=id;
+    });
+    renderBoard();
+    scheduleSpawn();
+  }
+
+  // on a phone the instructions would push the board off-screen; on a wide
+  // screen there's room to leave them open
+  if(window.innerWidth>=700) document.getElementById("howto").open=true;
+
+  const boot = ()=> startGame();
+  if(window.claude?.hot){
+    window.claude.hot.ready ? window.claude.hot.ready(boot) : boot();
+  } else {
+    boot();
+  }
+
+})();
+</script>
+
+</body>
+</html>
