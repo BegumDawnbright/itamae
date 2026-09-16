@@ -370,79 +370,186 @@
   body.paused .pot-bar i,body.paused .pot.warning{animation-play-state:paused;}
 
   /* ===================================================================
-     Skin: the room is dark indigo, the pass is lit, orders arrive on paper.
-     Materials borrowed from an actual sushi counter — noren over the door,
-     a glass neta case, paper chits, steel pots.
+     Skin — a sushi counter in daylight.
+     Room is oiled wood, the board is a real makisu (bamboo rolling mat),
+     ingredients sit on white ceramic, the stove is cold steel set into the
+     counter, and orders come in on paper clipped to a rail.
      =================================================================== */
+  :root{
+    --wood:#a97a4c; --wood-dark:#6f4b2c;
+    --bamboo:#e0c88e; --bamboo-mid:#cdb173; --bamboo-dark:#a98f55;
+    --paper:#f8f1e0; --ink:#3a2c1e; --ink-soft:#7d6a51;
+    --slate:#39434b; --slate-dark:#262e34;
+    --indigo:#27426d; --indigo-dark:#1a2e4e;
+    --hanko:#b8433a;
+
+    --bg:#a97a4c;
+    --panel:#7a5334;
+    --panel-alt:#8d6440;
+    --text:#f8f1e0;
+    --text-muted:#e3cfae;
+    --border:rgba(40,25,12,0.4);
+    --rice:#fdf8ec;
+    --tile-shadow:0 2px 0 rgba(90,60,30,0.35), 0 5px 12px rgba(50,30,12,0.3);
+  }
+
+  /* the counter: oiled planks running the length of the room */
   body{
     background:
-      radial-gradient(120% 80% at 50% -10%, #1b2534 0%, transparent 60%),
-      var(--bg);
+      repeating-linear-gradient(90deg,
+        rgba(60,35,14,0.10) 0 1px, transparent 1px 2px, transparent 2px 132px,
+        rgba(60,35,14,0.16) 132px 134px),
+      repeating-linear-gradient(0deg,
+        rgba(255,235,200,0.04) 0 3px, transparent 3px 9px),
+      linear-gradient(#b5834f, #93643a 55%, #855733);
   }
 
   /* noren — the split fabric banner hung over a shop door */
   .topbar{
-    background:linear-gradient(#22385a,#182a45);
+    background:linear-gradient(var(--indigo),var(--indigo-dark));
     border-bottom:none;border-radius:12px 12px 0 0;
-    padding:15px 18px 14px;position:relative;margin-bottom:12px;
-    box-shadow:0 6px 16px rgba(0,0,0,0.35);
+    padding:15px 18px 14px;position:relative;margin-bottom:13px;
+    box-shadow:0 7px 18px rgba(40,22,8,0.4);
   }
   .topbar::after{
-    content:"";position:absolute;left:0;right:0;bottom:-11px;height:12px;
-    background:#182a45;
+    content:"";position:absolute;left:0;right:0;bottom:-12px;height:13px;
+    background:var(--indigo-dark);
     -webkit-mask:repeating-linear-gradient(90deg,#000 0 23%,transparent 23% 25%);
             mask:repeating-linear-gradient(90deg,#000 0 23%,transparent 23% 25%);
   }
-  .brand .kanji{color:#f6efe0;}
-  .brand .sub{color:#9fb2cc;}
-  .stat .label{color:#8fa3bf;}
-  .stat .value{color:#f0c77a;}
-
-  /* the neta case: a lit, recessed surface rather than a flat panel */
-  .board{
-    background:#1a1f24;
-    box-shadow:inset 0 2px 10px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(243,233,210,0.05);
+  .brand .kanji{color:#f8f1e0;}
+  .brand .sub{color:#a8bad6;}
+  .stat .label{color:#9db0cd;}
+  .stat .value{color:#f2c477;}
+  .catalog-btn{
+    background:rgba(248,241,224,0.12);border-color:rgba(248,241,224,0.3);color:#f8f1e0;
   }
-  .slot{border-color:rgba(243,233,210,0.07);}
-  .tile{box-shadow:var(--tile-shadow), inset 0 1px 0 rgba(255,255,255,0.10);}
+  .catalog-btn:hover{background:rgba(248,241,224,0.2);border-color:#f2c477;color:#f2c477;}
 
-  /* orders arrive as paper chits, not UI cards */
+  /* instructions sit on the counter, so they get their own paper strip */
+  .howto{
+    background:rgba(248,241,224,0.9);border-radius:8px;padding:7px 12px;
+    color:var(--ink-soft);box-shadow:0 2px 5px rgba(50,30,12,0.22);
+  }
+  .howto summary{color:var(--hanko);font-weight:700;}
+  .howto b{color:var(--ink);}
+
+  /* the board sits in a wooden frame, like the work surface it is */
+  .board-card{
+    background:linear-gradient(var(--wood-dark),#5e3f24);
+    border:1px solid #452e19;
+    box-shadow:0 8px 20px rgba(40,22,8,0.42), inset 0 1px 0 rgba(255,225,190,0.14);
+  }
+  .board-card h2,.pots-title{color:#f3ddbd;}
+
+  /* makisu: bamboo slats tied with string */
+  .board{
+    /* slats kept low-contrast: the mat is a surface, not the subject */
+    background:
+      repeating-linear-gradient(90deg,
+        var(--bamboo) 0 15px,
+        var(--bamboo-mid) 15px 17px);
+    border-radius:7px;
+    box-shadow:
+      inset 0 0 0 1px rgba(80,55,20,0.3),
+      inset 0 2px 7px rgba(80,55,20,0.22),
+      0 2px 6px rgba(40,22,8,0.3);
+  }
+  .slot{
+    background:rgba(64,42,16,0.3);
+    border:1px solid rgba(255,246,222,0.35);
+    box-shadow:inset 0 2px 5px rgba(55,34,10,0.4), 0 1px 0 rgba(255,246,222,0.18);
+  }
+  .slot.dragover{background:rgba(184,67,58,0.3);border-color:#fff4d9;}
+
+  /* every ingredient is plated on white ceramic, ringed in its own colour */
+  .tile{
+    background:#fdfaf1;
+    border:1px solid rgba(70,48,22,0.22);
+    box-shadow:var(--tile-shadow), inset 0 1px 0 rgba(255,255,255,0.85);
+  }
+  .tile.tier-raw{box-shadow:var(--tile-shadow), inset 0 0 0 2px var(--hue), inset 0 1px 0 rgba(255,255,255,0.7);}
+  .tile.tier-mid{outline:none;box-shadow:var(--tile-shadow), inset 0 0 0 2px #7fa84c;}
+  .tile.tier-final{outline:none;box-shadow:var(--tile-shadow), inset 0 0 0 2.5px #e0a03a;}
+  .tile.rare{box-shadow:var(--tile-shadow), inset 0 0 0 2.5px #b07fd0, 0 0 10px rgba(176,127,208,0.5);}
+
+  .p-top{background:#fffdf7;border:1.5px solid var(--hue,rgba(70,48,22,0.3));}
+  .p-rice{box-shadow:0 1px 2px rgba(70,48,22,0.28), inset 0 0 0 1px rgba(70,48,22,0.14);}
+
+  .hint{color:#f6d79a;}
+
+  /* orders: paper chits clipped to a rail above the pass */
   .orders-panel{background:transparent;border:none;padding:0;}
-  .orders-panel h2{margin-bottom:9px;}
+  .orders-panel h2{color:#3d2512;text-shadow:0 1px 0 rgba(255,228,190,0.3);}
   .order{
     background:
-      repeating-linear-gradient(0deg, rgba(0,0,0,0.018) 0 2px, transparent 2px 4px),
-      #f3e9d4;
-    border:none;border-top:4px solid #b8433a;
+      repeating-linear-gradient(0deg, rgba(90,60,25,0.022) 0 2px, transparent 2px 4px),
+      var(--paper);
+    border:none;border-top:4px solid var(--hanko);
     border-radius:3px 3px 5px 5px;
-    box-shadow:0 3px 8px rgba(0,0,0,0.4);
+    box-shadow:0 4px 9px rgba(45,25,8,0.4);
     position:relative;
   }
   .order::before{ /* the clip holding the chit to the rail */
     content:"";position:absolute;top:-7px;left:50%;transform:translateX(-50%);
     width:26px;height:7px;border-radius:2px 2px 0 0;
-    background:linear-gradient(#8d9aa5,#5d6975);
+    background:linear-gradient(#b9c4cd,#77848f);
   }
-  .order .name{color:#33291f;font-weight:500;}
-  .order .qty{color:#8a7a62;}
-  .order.done{
-    background:#e4efd2;border-top-color:var(--wasabi);
-  }
-  .order.done .qty{color:#4d7a22;font-weight:700;}
-  .order .glyph{
-    background:#fffdf6;
-    box-shadow:inset 0 0 0 1px rgba(51,41,31,0.12);
-  }
-  .order .glyph .p-top{background:#fffdf6;border-color:rgba(51,41,31,0.22);}
-  .order .glyph .p-rice{box-shadow:inset 0 0 0 1px rgba(51,41,31,0.10);}
+  .order .name{color:var(--ink);font-weight:500;}
+  .order .qty{color:#8d7a5e;}
+  .order.done{background:#dcecc6;border-top-color:#4d7a22;}
+  .order.done .qty{color:#3f6a1a;font-weight:700;}
+  .order .glyph{background:#fffdf7;box-shadow:inset 0 0 0 1px rgba(58,44,30,0.14);}
+  .order .glyph .p-top{background:#fffdf7;}
 
-  /* steel pots on a stone stove */
-  .pot{background:linear-gradient(#272d33,#1f252a);border-color:rgba(243,233,210,0.1);}
-  .pot-slot{
-    background:radial-gradient(60% 70% at 50% 25%, #1d2429 0%, #0d1114 100%);
-    border-color:#5e6b74;border-top-color:#8695a1;
+  /* the stove is steel set into the counter */
+  .stove-row{
+    background:linear-gradient(var(--slate-dark),#1d2429);
+    border-radius:10px;padding:8px;gap:8px;
+    box-shadow:inset 0 2px 8px rgba(0,0,0,0.5);
   }
-  .trash{background:linear-gradient(#22282d,#1b2126);}
+  .pot{background:linear-gradient(#49545d,#333c44);border-color:rgba(255,245,225,0.14);}
+  .pot-slot{
+    background:radial-gradient(60% 70% at 50% 25%, #2b343b 0%, #0e1215 100%);
+    border-color:#8c9aa5;border-top-color:#c3cfd8;
+  }
+  .pot-label{color:#c3cfd8;}
+  .trash{
+    background:linear-gradient(#3b444c,#2a3238);
+    border:1px dashed rgba(255,245,225,0.28);
+  }
+  .trash-label{color:#c3cfd8;}
+  .trash.dragover{border-color:var(--hanko);background:rgba(184,67,58,0.25);}
+
+  /* catalogue and game-over read as printed paper, not a dark UI */
+  .modal{background:rgba(45,25,10,0.68);}
+  .modal-card{background:var(--paper);border:1px solid #c9b58d;color:var(--ink);}
+  .modal-head{border-bottom:1px solid rgba(70,48,22,0.18);}
+  .modal-head h2{color:var(--ink);}
+  .close-btn{border-color:rgba(70,48,22,0.3);color:var(--ink-soft);}
+  .close-btn:hover{border-color:var(--hanko);color:var(--hanko);}
+  .cat-sec h3{color:var(--ink);}
+  .cat-sec h3 small{color:var(--ink-soft);}
+  .cat-card{background:#fffdf7;border:1px solid rgba(70,48,22,0.16);box-shadow:0 1px 3px rgba(70,48,22,0.12);}
+  .cat-box{
+    background:#fdfaf1;border:1px solid rgba(70,48,22,0.2);
+    box-shadow:inset 0 0 0 2px var(--hue,transparent), inset 0 1px 0 rgba(255,255,255,0.8);
+  }
+  .cat-name{color:var(--ink);}
+  .cat-made{color:var(--ink-soft);}
+  .cat-found{color:#3f6a1a;background:rgba(127,168,76,0.18);}
+  .cat-chip{background:#fffdf7;border-color:rgba(70,48,22,0.2);}
+  .cat-recipe .op{color:var(--ink-soft);}
+
+  .overlay{background:rgba(45,25,10,0.78);}
+  .overlay-card{background:var(--paper);border:1px solid #c9b58d;}
+  .overlay-card h2{color:var(--hanko);}
+  .overlay-card p{color:var(--ink-soft);}
+  .overlay-stats .stat .label{color:var(--ink-soft);}
+  .overlay-stats .stat .value{color:var(--ink);}
+  .restart-btn{background:var(--hanko);color:#fff4ea;}
+  .restart-btn:hover{background:#cc5148;}
+
 
   @media (max-width:560px){
     /* the whole game has to sit in one screen — you drag between the orders,
@@ -588,83 +695,107 @@
   // and drawn shapes stay legible at 40px where a photo turns to mush.
   const svg = body => `<svg class="ic" viewBox="0 0 32 32" aria-hidden="true">${body}</svg>`;
 
+  // Every silhouette carries a dark keyline. paint-order draws the stroke
+  // under the fill, so only its outer half shows and the shape keeps its size.
+  const K='stroke="#221913" stroke-linejoin="round" paint-order="stroke"';
+  const O=`${K} stroke-width="2"`;      // main shapes
+  const o=`${K} stroke-width="1.6"`;    // small clustered shapes
+
   const ICONS = {
     // loose dry grains stacked into a heap — no solid silhouette behind them,
     // which is what separates it from the cooked mound
-    PR_RAW: svg(`<g fill="#e8d9b0" stroke="#b09767" stroke-width="0.7">
+    PR_RAW: svg(`<g fill="#e8d9b0" ${o}>
         <ellipse cx="8.5" cy="23" rx="2.4" ry="3.7" transform="rotate(-16 8.5 23)"/>
+        <ellipse cx="23.5" cy="23" rx="2.4" ry="3.7" transform="rotate(16 23.5 23)"/>
         <ellipse cx="13.5" cy="23.6" rx="2.4" ry="3.7" transform="rotate(-5 13.5 23.6)"/>
         <ellipse cx="18.5" cy="23.6" rx="2.4" ry="3.7" transform="rotate(5 18.5 23.6)"/>
-        <ellipse cx="23.5" cy="23" rx="2.4" ry="3.7" transform="rotate(16 23.5 23)"/>
         <ellipse cx="11" cy="17.4" rx="2.4" ry="3.7" transform="rotate(-12 11 17.4)"/>
-        <ellipse cx="16" cy="17.8" rx="2.4" ry="3.7"/>
         <ellipse cx="21" cy="17.4" rx="2.4" ry="3.7" transform="rotate(12 21 17.4)"/>
+        <ellipse cx="16" cy="17.8" rx="2.4" ry="3.7"/>
         <ellipse cx="16" cy="11.6" rx="2.4" ry="3.7" transform="rotate(-4 16 11.6)"/></g>`),
 
-    PR: svg(`<path d="M5 23c0-6.5 5-11 11-11s11 4.5 11 11z" fill="#fdf7ea"/>
-      <g fill="#ffffff" opacity=".9">
-        <ellipse cx="12" cy="18" rx="2.2" ry="3.4" transform="rotate(-20 12 18)"/>
-        <ellipse cx="19" cy="17" rx="2.2" ry="3.4" transform="rotate(18 19 17)"/>
-        <ellipse cx="16" cy="21" rx="2.2" ry="3.4"/></g>
-      <rect x="3" y="23" width="26" height="4" rx="2" fill="#e5d8bd"/>`),
+    PR: svg(`<path d="M5 23.5c0-6.5 5-11 11-11s11 4.5 11 11z" fill="#fffdf6" ${O}/>
+      <rect x="3" y="23" width="26" height="4.5" rx="2.25" fill="#d9c79c" ${O}/>
+      <g fill="none" stroke="#cdbb92" stroke-width="0.9">
+        <ellipse cx="12" cy="19" rx="2.2" ry="3" transform="rotate(-20 12 19)"/>
+        <ellipse cx="19" cy="18" rx="2.2" ry="3" transform="rotate(18 19 18)"/></g>`),
 
-    NR: svg(`<rect x="5" y="6" width="22" height="20" rx="2.5" fill="#15291e"/>
-      <path d="M8.5 11h15M8.5 16h15M8.5 21h11" stroke="#2c4b36" stroke-width="1.4" stroke-linecap="round"/>
-      <rect x="5" y="6" width="22" height="20" rx="2.5" fill="none" stroke="#3d6349" stroke-width="1"/>`),
+    NR: svg(`<rect x="5" y="6" width="22" height="20" rx="2.5" fill="#1b3327" ${O}/>
+      <path d="M8.5 11h15M8.5 16h15M8.5 21h11" stroke="#3d6349" stroke-width="1.4" stroke-linecap="round"/>`),
 
-    SM: svg(`<rect x="3" y="9" width="26" height="14" rx="5" fill="#f4886a"/>
-      <path d="M6 13.5c6 1.2 14 1.2 20 0M6 18.5c6 1.2 14 1.2 20 0" stroke="#ffd6c4"
-        stroke-width="2.2" stroke-linecap="round" fill="none"/>`),
+    SM: svg(`<rect x="3" y="9.5" width="26" height="13" rx="6" fill="#f4886a" ${O}/>
+      <path d="M6.5 13.8c6 1.2 13 1.2 19 0M6.5 18.2c6 1.2 13 1.2 19 0" stroke="#ffe0d1"
+        stroke-width="2.4" stroke-linecap="round" fill="none"/>`),
 
-    TN: svg(`<rect x="3" y="9" width="26" height="14" rx="5" fill="#b5322a"/>
-      <path d="M7 14h18M7 18h18" stroke="#8a1f18" stroke-width="1.8" stroke-linecap="round"/>`),
+    // two stacked slices, so the tuna never reads as a recoloured salmon
+    TN: svg(`<rect x="4" y="16" width="24" height="11" rx="5.5" fill="#8f231d" ${O}/>
+      <path d="M8 21.5h16" stroke="#661511" stroke-width="1.6" stroke-linecap="round"/>
+      <rect x="4" y="6" width="24" height="11" rx="5.5" fill="#c33a2e" ${O}/>
+      <path d="M8 10.4h16M8 13.6h16" stroke="#8f231d" stroke-width="1.6" stroke-linecap="round"/>`),
 
-    EB: svg(`<path d="M23 9c-7.5 0-12.5 4.2-12.5 10.2 0 3.6 2.6 5.8 5.6 5.8" fill="none"
-        stroke="#f2a184" stroke-width="6.5" stroke-linecap="round"/>
-      <path d="M14 13.5l2.5 3M11.8 18l3 2.2" stroke="#dd7455" stroke-width="1.8" stroke-linecap="round"/>
-      <path d="M23.5 6.5l4.5 3-4.5 3z" fill="#dd7455"/>`),
+    EB: svg(`<path d="M23 9.5c-7.5 0-12.5 4.2-12.5 10.2 0 3.6 2.6 5.8 5.6 5.8" fill="none"
+        stroke="#221913" stroke-width="10.5" stroke-linecap="round"/>
+      <path d="M23 9.5c-7.5 0-12.5 4.2-12.5 10.2 0 3.6 2.6 5.8 5.6 5.8" fill="none"
+        stroke="#f2a184" stroke-width="7" stroke-linecap="round"/>
+      <path d="M14 14l2.5 3M11.8 18.5l3 2.2" stroke="#dd7455" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M23.5 6l5 3.5-5 3.5z" fill="#dd7455" ${O}/>`),
 
-    AV: svg(`<ellipse cx="16" cy="16.5" rx="9" ry="11" fill="#7aa83c"/>
-      <ellipse cx="16" cy="16.5" rx="6.4" ry="8.4" fill="#d3e6a2"/>
-      <ellipse cx="16" cy="16.5" rx="3.3" ry="4" fill="#8b5a2b"/>`),
+    // pear silhouette with a big pit — nothing like the cucumber baton
+    AV: svg(`<path d="M16 3.5c4.7 0 8.2 4.7 8.2 10.8 0 7.6-3.7 13.7-8.2 13.7S7.8 21.9 7.8 14.3C7.8 8.2 11.3 3.5 16 3.5z"
+        fill="#5f8b2e" ${O}/>
+      <path d="M16 6.8c3.3 0 5.8 3.6 5.8 8.2 0 5.9-2.6 10.6-5.8 10.6s-5.8-4.7-5.8-10.6c0-4.6 2.5-8.2 5.8-8.2z"
+        fill="#d3e6a2"/>
+      <ellipse cx="16" cy="17.2" rx="3.7" ry="4.4" fill="#8b5a2b" ${o}/>
+      <ellipse cx="14.9" cy="15.7" rx="1" ry="1.3" fill="#a9733d"/>`),
 
-    SL: svg(`<circle cx="16" cy="16" r="10" fill="#96c455"/>
-      <circle cx="16" cy="16" r="7.4" fill="#e8f4cd"/>
-      <g fill="#a8ce6c">
-        <ellipse cx="16" cy="11.6" rx="1.5" ry="2"/><ellipse cx="19.6" cy="16" rx="2" ry="1.5"/>
-        <ellipse cx="16" cy="20.4" rx="1.5" ry="2"/><ellipse cx="12.4" cy="16" rx="2" ry="1.5"/></g>`),
+    // cut as a baton, the way it goes into a kappa roll
+    SL: svg(`<g transform="rotate(-32 16 16)">
+        <rect x="3.5" y="11.5" width="25" height="9" rx="4.5" fill="#6ea83a" ${O}/>
+        <rect x="5" y="13" width="15" height="3" rx="1.5" fill="#8cc457" opacity=".9"/>
+        <rect x="20.8" y="13.2" width="6.4" height="5.6" rx="2.8" fill="#e8f4cd" ${o}/>
+        <g fill="#b9d98c">
+          <circle cx="24" cy="15.3" r="0.8"/><circle cx="24.9" cy="17.3" r="0.8"/>
+          <circle cx="22.8" cy="17.1" r="0.8"/></g>
+      </g>`),
 
-    CR: svg(`<path d="M16 6l10 4.5v11L16 26 6 21.5v-11z" fill="#f2e7c9"/>
-      <path d="M16 6l10 4.5L16 15 6 10.5z" fill="#fdf8e8"/>
-      <path d="M16 15v11l10-4.5v-11z" fill="#e0d2ad"/>`),
+    CR: svg(`<g ${O}>
+        <path d="M6.2 11.1L16 15.7v9.8L6.2 20.9z" fill="#efe1bd"/>
+        <path d="M25.8 11.1L16 15.7v9.8l9.8-4.6z" fill="#dccca0"/>
+        <path d="M16 6.5l9.8 4.6L16 15.7 6.2 11.1z" fill="#fffaea"/>
+      </g>`),
 
-    TB: svg(`<g fill="#ee8c26">
+    TB: svg(`<g fill="#ee8c26" ${o}>
         <circle cx="11" cy="13" r="4.4"/><circle cx="20.5" cy="12" r="4.4"/>
-        <circle cx="16" cy="20" r="4.4"/><circle cx="23" cy="20.5" r="4"/><circle cx="8.5" cy="21" r="4"/></g>
+        <circle cx="8.5" cy="21" r="4"/><circle cx="23" cy="20.5" r="4"/>
+        <circle cx="16" cy="20" r="4.4"/></g>
       <g fill="#ffd8a0" opacity=".85">
         <circle cx="9.6" cy="11.6" r="1.3"/><circle cx="19.1" cy="10.6" r="1.3"/>
         <circle cx="14.6" cy="18.6" r="1.3"/></g>`),
 
-    WS: svg(`<path d="M6.5 24c0-7.5 4.2-13.5 9.5-13.5S25.5 16.5 25.5 24z" fill="#74ad36"/>
-      <path d="M12 22c.2-4.2 1.8-7.2 3.6-8.6" stroke="#a9d76a" stroke-width="2.2"
+    // yellower green than the avocado and cucumber, plus grater texture
+    WS: svg(`<path d="M6.5 24c0-7.5 4.2-13.5 9.5-13.5S25.5 16.5 25.5 24z" fill="#9dbb2e" ${O}/>
+      <rect x="4" y="23.5" width="24" height="3.6" rx="1.8" fill="#63791a" ${O}/>
+      <path d="M12 22c.2-4.4 1.8-7.6 3.6-9" stroke="#cfe07a" stroke-width="2.2"
         fill="none" stroke-linecap="round"/>
-      <rect x="4" y="24" width="24" height="3" rx="1.5" fill="#4d7a22"/>`),
+      <g stroke="#7d9620" stroke-width="0.9" stroke-linecap="round">
+        <path d="M18.5 22l1.4-3M21 22.5l1.2-2.2"/></g>`),
 
-    UN: svg(`<rect x="3" y="10" width="26" height="12" rx="3" fill="#6b4122"/>
-      <rect x="3" y="10" width="26" height="4.5" rx="2.2" fill="#8d5c2f" opacity=".75"/>
-      <path d="M10 10.5v11M16 10.5v11M22 10.5v11" stroke="#46280f" stroke-width="1.7"/>`),
+    UN: svg(`<rect x="3" y="10" width="26" height="12" rx="3.5" fill="#6b4122" ${O}/>
+      <rect x="4.5" y="11.3" width="23" height="3.6" rx="1.8" fill="#9c6733" opacity=".8"/>
+      <path d="M10 11v10M16 11v10M22 11v10" stroke="#3d220e" stroke-width="1.7"/>`),
 
-    UNI: svg(`<rect x="4" y="17" width="24" height="9" rx="2" fill="#15291e"/>
-      <g fill="#ef9f3a">
-        <ellipse cx="10.5" cy="14.5" rx="4" ry="6"/><ellipse cx="16" cy="12.5" rx="4" ry="6.6"/>
-        <ellipse cx="21.5" cy="14.5" rx="4" ry="6"/></g>
-      <g fill="#ffc987" opacity=".7">
-        <ellipse cx="9.6" cy="12.5" rx="1.3" ry="2.2"/><ellipse cx="15.2" cy="10.4" rx="1.3" ry="2.2"/></g>`),
+    UNI: svg(`<rect x="4" y="17" width="24" height="9" rx="2" fill="#1b3327" ${O}/>
+      <g fill="#ef9f3a" ${o}>
+        <ellipse cx="10.5" cy="14.5" rx="4" ry="6"/><ellipse cx="21.5" cy="14.5" rx="4" ry="6"/>
+        <ellipse cx="16" cy="12.5" rx="4" ry="6.6"/></g>
+      <g fill="#ffc987" opacity=".75">
+        <ellipse cx="9.6" cy="12.5" rx="1.2" ry="2"/><ellipse cx="15.2" cy="10.4" rx="1.2" ry="2"/></g>`),
 
-    BURNT: svg(`<path d="M5 23c0-6.5 5-11 11-11s11 4.5 11 11z" fill="#2e2622"/>
-      <rect x="3" y="23" width="26" height="4" rx="2" fill="#1d1715"/>
+    BURNT: svg(`<path d="M5 23.5c0-6.5 5-11 11-11s11 4.5 11 11z" fill="#2e2622" ${O}/>
+      <rect x="3" y="23" width="26" height="4.5" rx="2.25" fill="#1d1715" ${O}/>
       <path d="M13 19c0-2.5 1.5-4 3-5.5-.5 2 2.5 2.5 2.5 5A2.8 2.8 0 0 1 13 19z" fill="#f2907a"/>`),
   };
+
 
   const ITEMS = {
     PR_RAW: {name:"Çiğ Pirinç", icon:ICONS.PR_RAW, bg:"#c9b98f", tier:"raw"},
@@ -673,11 +804,11 @@
     SM:  {name:"Somon", icon:ICONS.SM, bg:"#f2907a", tier:"raw"},
     TN:  {name:"Ton Balığı", icon:ICONS.TN, bg:"#c0392b", tier:"raw"},
     EB:  {name:"Ebi (Karides)", icon:ICONS.EB, bg:"#e67e52", tier:"raw"},
-    AV:  {name:"Avokado", icon:ICONS.AV, bg:"#7fa84c", tier:"raw"},
-    SL:  {name:"Salatalık", icon:ICONS.SL, bg:"#a8c97f", tier:"raw"},
-    CR:  {name:"Cream Cheese", icon:ICONS.CR, bg:"#ede1b8", tier:"raw"},
+    AV:  {name:"Avokado", icon:ICONS.AV, bg:"#4f7d24", tier:"raw"},
+    SL:  {name:"Salatalık", icon:ICONS.SL, bg:"#7fc142", tier:"raw"},
+    CR:  {name:"Cream Cheese", icon:ICONS.CR, bg:"#c3a86e", tier:"raw"},
     TB:  {name:"Tarama", icon:ICONS.TB, bg:"#e8a33d", tier:"raw"},
-    WS:  {name:"Wasabi", icon:ICONS.WS, bg:"#6b9b37", tier:"raw"},
+    WS:  {name:"Wasabi", icon:ICONS.WS, bg:"#9dbb2e", tier:"raw"},
     UN:  {name:"Unagi", icon:ICONS.UN, bg:"#6b4a32", tier:"raw"},
     UNI: {name:"Uni", icon:ICONS.UNI, bg:"#ef9f3a", tier:"raw"},
 
@@ -1015,7 +1146,7 @@
     if(toppings.length){
       html+='<div class="p-toppings">';
       toppings.slice(0,3).forEach(t=>{
-        html+=`<div class="p-top" style="border-color:${ITEMS[t].bg}80">${ITEMS[t].icon}</div>`;
+        html+=`<div class="p-top" style="--hue:${ITEMS[t].bg}">${ITEMS[t].icon}</div>`;
       });
       html+='</div>';
     }
@@ -1027,9 +1158,9 @@
     const it=ITEMS[id];
     const cls=["tile", it.tier==="mid"?"tier-mid":"", it.tier==="final"?"tier-final":"", it.rare?"rare":""].join(" ").trim();
     if(it.tier==="raw"){
-      return `<div class="${cls} tier-raw" style="background:${it.bg}26;border-color:${it.bg}59;" title="${it.name}">${it.icon}</div>`;
+      return `<div class="${cls} tier-raw" style="--hue:${it.bg}" title="${it.name}">${it.icon}</div>`;
     }
-    return `<div class="${cls}" style="background:var(--panel-alt);" title="${it.name}">${pieceHTML(id)}</div>`;
+    return `<div class="${cls}" title="${it.name}">${pieceHTML(id)}</div>`;
   }
 
   // renderBoard(changes): changes is an optional {index: animClass} map.
@@ -1233,9 +1364,7 @@
   const catalogBody=document.getElementById("catalogBody");
 
   const catVisual=id=> ITEMS[id].tier==="raw" ? ITEMS[id].icon : pieceHTML(id);
-  const catBoxStyle=id=> ITEMS[id].tier==="raw"
-    ? `background:${ITEMS[id].bg}26;border-color:${ITEMS[id].bg}59;`
-    : "background:var(--panel-alt);";
+  const catBoxStyle=id=> ITEMS[id].tier==="raw" ? `--hue:${ITEMS[id].bg}` : "";
 
   function catCard(id){
     const it=ITEMS[id];
