@@ -293,26 +293,56 @@
   .restart-btn:hover{background:#f7a692;}
   .restart-btn:focus-visible, .recipe-toggle:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
 
-  /* phone: keep the board and the stove on one screen, since you have to
-     drag between them */
+  /* Phone: orders, board and stove all have to be reachable without
+     scrolling — you drag between them, so a scroll mid-drag loses the move.
+     Every block below is trimmed to fit one ~700px screen. */
   @media (max-width:560px){
-    body{padding:12px 12px 24px;}
-    .wrap{gap:12px;}
-    .brand .kanji{font-size:1.5rem;}
+    body{padding:8px 12px 20px;}
+    .wrap{gap:6px;}
+    .brand .kanji{font-size:1.35rem;}
     .brand .sub{display:none;}
-    .stats{gap:14px;}
-    .topbar{padding-bottom:10px;}
-    .panel,.board-card{padding:12px 11px;}
-    .board{grid-template-columns:repeat(5,1fr);gap:6px;padding:7px;}
-    .board-card h2,.panel h2{font-size:0.95rem;margin-bottom:9px;}
-    .pots-title{margin-top:11px;}
-    .order{min-width:96px;padding:9px 6px 8px;}
-    .order .glyph{width:46px;height:46px;}
-    .order .name{font-size:0.72rem;}
-    .pot{padding:8px 6px;gap:5px;}
-    .trash{flex-basis:62px;padding:8px 6px;}
-    .trash svg.ic{width:24px;height:24px;}
-    .board-layout{gap:12px;}
+    .topbar{padding-bottom:6px;}
+    .stats{gap:16px;}
+    .stat .label{font-size:0.6rem;}
+    .stat .value{font-size:1.1rem;}
+    .howto summary{font-size:0.74rem;}
+
+    .panel,.board-card{padding:10px;}
+    .board-layout{gap:8px;}
+
+    /* all five tickets share the width instead of scrolling sideways */
+    .orders-panel{padding:8px 8px 9px;}
+    .orders-panel h2{display:none;}
+    .order-strip{overflow-x:visible;gap:5px;}
+    .order{min-width:0;flex:1 1 0;padding:7px 3px 6px;gap:4px;border-top-width:2px;}
+    .order .glyph{width:100%;max-width:40px;height:38px;border-radius:7px;}
+    .order .name{
+      font-size:0.56rem;line-height:1.15;
+      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+    }
+    .order .qty{display:none;}
+
+    /* 6 columns keeps the board at 5 rows; 5 columns would add a sixth */
+    .board-card h2{display:none;}
+    /* Everything except the board costs ~330px on a phone, so cap the board
+       to what's left: cells are square, 6 across by 5 down, so the width that
+       fits a given height is height x 6/5. dvh follows the browser chrome. */
+    .board{
+      grid-template-columns:repeat(6,1fr);gap:5px;padding:5px;
+      width:min(100%, calc((100vh - 340px) * 1.2));
+      width:min(100%, calc((100dvh - 340px) * 1.2));
+      margin-inline:auto;
+    }
+    .hint{font-size:0.72rem;margin-top:6px;min-height:1.1em;}
+
+    .pots-title{display:none;}
+    .stove-row{gap:7px;margin-top:7px;}
+    .pot{padding:6px 4px;gap:4px;}
+    .pot-slot{width:38px;height:32px;}
+    .pot-label{font-size:0.58rem;}
+    .trash{flex-basis:54px;padding:7px 4px;}
+    .trash svg.ic{width:22px;height:22px;}
+    .trash-label{font-size:0.58rem;}
   }
 </style>
 </head>
