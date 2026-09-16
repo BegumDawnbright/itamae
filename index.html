@@ -133,6 +133,14 @@
     overflow:hidden;
   }
   .p-top svg.ic{width:86%;height:86%;}
+
+  /* In the small previews the rice is only context — what identifies the
+     sushi is what's on top, so shrink the base and enlarge the toppings. */
+  .order .glyph .piece,.recipe-row .glyph .piece{width:94%;height:94%;}
+  .order .glyph .p-rice,.recipe-row .glyph .p-rice{left:18%;right:18%;bottom:3%;height:32%;}
+  .order .glyph .p-nori,.recipe-row .glyph .p-nori{left:18%;right:18%;bottom:16%;height:10%;}
+  .order .glyph .p-toppings,.recipe-row .glyph .p-toppings{gap:4%;}
+  .order .glyph .p-top,.recipe-row .glyph .p-top{width:48%;border-width:1px;}
   .tile.rare{box-shadow:var(--tile-shadow),0 0 0 2px var(--gold);}
   .tile.merged{animation:merge 0.32s ease-out;}
   .tile.bad{animation:shake 0.28s ease-in-out;}
