@@ -61,11 +61,11 @@
   .howto b{color:var(--rice);font-weight:500;}
 
   /* layout */
-  .board-layout{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;}
+  .board-layout{display:flex;justify-content:center;}
 
   .board-card{
     background:var(--panel);border:1px solid var(--border);border-radius:14px;
-    padding:16px;flex:1 1 480px;min-width:280px;
+    padding:16px;width:100%;max-width:620px;
   }
   .board-card h2{font-family:"Shippori Mincho",serif;font-size:1.05rem;color:var(--rice);font-weight:500;margin-bottom:12px;}
 
@@ -136,11 +136,11 @@
 
   /* In the small previews the rice is only context — what identifies the
      sushi is what's on top, so shrink the base and enlarge the toppings. */
-  .order .glyph .piece,.recipe-row .glyph .piece{width:94%;height:94%;}
-  .order .glyph .p-rice,.recipe-row .glyph .p-rice{left:18%;right:18%;bottom:3%;height:32%;}
-  .order .glyph .p-nori,.recipe-row .glyph .p-nori{left:18%;right:18%;bottom:16%;height:10%;}
-  .order .glyph .p-toppings,.recipe-row .glyph .p-toppings{gap:4%;}
-  .order .glyph .p-top,.recipe-row .glyph .p-top{width:48%;border-width:1px;}
+  .order .glyph .piece,.recipe-row .glyph .piece,.cat-chip .piece{width:94%;height:94%;}
+  .order .glyph .p-rice,.recipe-row .glyph .p-rice,.cat-chip .p-rice{left:18%;right:18%;bottom:3%;height:32%;}
+  .order .glyph .p-nori,.recipe-row .glyph .p-nori,.cat-chip .p-nori{left:18%;right:18%;bottom:16%;height:10%;}
+  .order .glyph .p-toppings,.recipe-row .glyph .p-toppings,.cat-chip .p-toppings{gap:4%;}
+  .order .glyph .p-top,.recipe-row .glyph .p-top,.cat-chip .p-top{width:48%;border-width:1px;}
   .tile.rare{box-shadow:var(--tile-shadow),0 0 0 2px var(--gold);}
   .tile.merged{animation:merge 0.32s ease-out;}
   .tile.bad{animation:shake 0.28s ease-in-out;}
@@ -304,8 +304,154 @@
   /* Phone: orders, board and stove all have to be reachable without
      scrolling — you drag between them, so a scroll mid-drag loses the move.
      Every block below is trimmed to fit one ~700px screen. */
+  /* catalogue */
+  .topbar-right{display:flex;align-items:flex-end;gap:16px;}
+  .catalog-btn{
+    background:rgba(243,233,210,0.08);border:1px solid var(--border);color:var(--rice);
+    font-family:"Zen Maru Gothic",sans-serif;font-size:0.78rem;
+    border-radius:8px;padding:6px 12px;cursor:pointer;white-space:nowrap;
+  }
+  .catalog-btn:hover{border-color:var(--gold);color:var(--gold);}
+  .catalog-btn:focus-visible,.close-btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+
+  .modal{
+    position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;
+    background:rgba(8,11,15,0.8);padding:14px;
+  }
+  .modal-card{
+    background:var(--panel);border:1px solid var(--border);border-radius:14px;
+    width:min(940px,100%);max-height:88vh;max-height:88dvh;
+    display:flex;flex-direction:column;overflow:hidden;
+    box-shadow:0 18px 50px rgba(0,0,0,0.55);
+  }
+  .modal-head{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:13px 15px;border-bottom:1px solid var(--border);
+  }
+  .modal-head h2{font-family:"Shippori Mincho",serif;font-size:1.02rem;color:var(--rice);font-weight:500;}
+  .close-btn{
+    background:none;border:1px solid var(--border);color:var(--text-muted);
+    border-radius:8px;padding:5px 12px;cursor:pointer;font-family:inherit;font-size:0.78rem;
+  }
+  .close-btn:hover{border-color:var(--salmon);color:var(--rice);}
+  .modal-body{overflow-y:auto;padding:14px 15px 20px;display:flex;flex-direction:column;gap:19px;}
+
+  .cat-sec{display:flex;flex-direction:column;gap:9px;}
+  .cat-sec h3{font-family:"Shippori Mincho",serif;font-size:0.94rem;color:var(--rice);font-weight:500;}
+  .cat-sec h3 small{
+    color:var(--text-muted);font-family:"Zen Maru Gothic",sans-serif;
+    font-size:0.68rem;font-weight:400;margin-left:7px;
+  }
+  .cat-grid{display:grid;gap:9px;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));}
+  .cat-card{
+    background:var(--panel-alt);border:1px solid var(--border);border-radius:10px;
+    padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;
+  }
+  .cat-box{
+    width:62px;height:62px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+    border:1px solid rgba(0,0,0,0.3);
+    box-shadow:0 2px 0 rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+  .cat-box > svg.ic{width:74%;height:74%;}
+  .cat-name{font-size:0.76rem;line-height:1.25;}
+  .cat-found{
+    font-size:0.6rem;color:var(--wasabi);letter-spacing:0.03em;
+    background:rgba(127,168,76,0.14);border-radius:20px;padding:1px 8px;
+  }
+  .cat-made{font-size:0.62rem;color:var(--text-muted);line-height:1.3;}
+  .cat-recipe{display:flex;align-items:center;gap:4px;justify-content:center;}
+  .cat-chip{
+    width:28px;height:28px;border-radius:6px;background:#161b1f;
+    display:flex;align-items:center;justify-content:center;border:1px solid var(--border);
+  }
+  .cat-recipe .op{color:var(--text-muted);font-family:"JetBrains Mono",monospace;font-size:0.72rem;}
+
+  /* reading the catalogue shouldn't cost you the board */
+  body.paused .pot-bar i,body.paused .pot.warning{animation-play-state:paused;}
+
+  /* ===================================================================
+     Skin: the room is dark indigo, the pass is lit, orders arrive on paper.
+     Materials borrowed from an actual sushi counter — noren over the door,
+     a glass neta case, paper chits, steel pots.
+     =================================================================== */
+  body{
+    background:
+      radial-gradient(120% 80% at 50% -10%, #1b2534 0%, transparent 60%),
+      var(--bg);
+  }
+
+  /* noren — the split fabric banner hung over a shop door */
+  .topbar{
+    background:linear-gradient(#22385a,#182a45);
+    border-bottom:none;border-radius:12px 12px 0 0;
+    padding:15px 18px 14px;position:relative;margin-bottom:12px;
+    box-shadow:0 6px 16px rgba(0,0,0,0.35);
+  }
+  .topbar::after{
+    content:"";position:absolute;left:0;right:0;bottom:-11px;height:12px;
+    background:#182a45;
+    -webkit-mask:repeating-linear-gradient(90deg,#000 0 23%,transparent 23% 25%);
+            mask:repeating-linear-gradient(90deg,#000 0 23%,transparent 23% 25%);
+  }
+  .brand .kanji{color:#f6efe0;}
+  .brand .sub{color:#9fb2cc;}
+  .stat .label{color:#8fa3bf;}
+  .stat .value{color:#f0c77a;}
+
+  /* the neta case: a lit, recessed surface rather than a flat panel */
+  .board{
+    background:#1a1f24;
+    box-shadow:inset 0 2px 10px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(243,233,210,0.05);
+  }
+  .slot{border-color:rgba(243,233,210,0.07);}
+  .tile{box-shadow:var(--tile-shadow), inset 0 1px 0 rgba(255,255,255,0.10);}
+
+  /* orders arrive as paper chits, not UI cards */
+  .orders-panel{background:transparent;border:none;padding:0;}
+  .orders-panel h2{margin-bottom:9px;}
+  .order{
+    background:
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.018) 0 2px, transparent 2px 4px),
+      #f3e9d4;
+    border:none;border-top:4px solid #b8433a;
+    border-radius:3px 3px 5px 5px;
+    box-shadow:0 3px 8px rgba(0,0,0,0.4);
+    position:relative;
+  }
+  .order::before{ /* the clip holding the chit to the rail */
+    content:"";position:absolute;top:-7px;left:50%;transform:translateX(-50%);
+    width:26px;height:7px;border-radius:2px 2px 0 0;
+    background:linear-gradient(#8d9aa5,#5d6975);
+  }
+  .order .name{color:#33291f;font-weight:500;}
+  .order .qty{color:#8a7a62;}
+  .order.done{
+    background:#e4efd2;border-top-color:var(--wasabi);
+  }
+  .order.done .qty{color:#4d7a22;font-weight:700;}
+  .order .glyph{
+    background:#fffdf6;
+    box-shadow:inset 0 0 0 1px rgba(51,41,31,0.12);
+  }
+  .order .glyph .p-top{background:#fffdf6;border-color:rgba(51,41,31,0.22);}
+  .order .glyph .p-rice{box-shadow:inset 0 0 0 1px rgba(51,41,31,0.10);}
+
+  /* steel pots on a stone stove */
+  .pot{background:linear-gradient(#272d33,#1f252a);border-color:rgba(243,233,210,0.1);}
+  .pot-slot{
+    background:radial-gradient(60% 70% at 50% 25%, #1d2429 0%, #0d1114 100%);
+    border-color:#5e6b74;border-top-color:#8695a1;
+  }
+  .trash{background:linear-gradient(#22282d,#1b2126);}
+
   @media (max-width:560px){
-    body{padding:8px 12px 20px;}
+    /* the whole game has to sit in one screen — you drag between the orders,
+       the board and the stove, and a scroll mid-drag loses the move */
+    html,body{height:100%;overflow:hidden;}
+    body{padding:8px 12px 10px;height:100dvh;}
+    .wrap{height:100%;justify-content:center;}
+    .topbar{padding:11px 13px 10px;margin-bottom:10px;border-radius:10px 10px 0 0;}
+    .topbar::after{bottom:-9px;height:10px;}
     .wrap{gap:6px;}
     .brand .kanji{font-size:1.35rem;}
     .brand .sub{display:none;}
@@ -364,9 +510,12 @@
       <div class="kanji">板前 <span style="font-size:1rem;color:var(--text-muted);font-family:'Zen Maru Gothic',sans-serif;font-weight:400;">Itamae</span></div>
       <div class="sub">malzeme birleştirme mutfağı — sipariş prototipi</div>
     </div>
-    <div class="stats">
-      <div class="stat"><span class="label">Puan</span><span class="value" id="scoreVal">0</span></div>
-      <div class="stat"><span class="label">Tamamlanan</span><span class="value" id="doneVal">0</span></div>
+    <div class="topbar-right">
+      <div class="stats">
+        <div class="stat"><span class="label">Puan</span><span class="value" id="scoreVal">0</span></div>
+        <div class="stat"><span class="label">Tamamlanan</span><span class="value" id="doneVal">0</span></div>
+      </div>
+      <button class="catalog-btn" id="catalogBtn" type="button">Katalog</button>
     </div>
   </div>
 
@@ -405,18 +554,16 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
 
-    <div class="sidebar">
-      <div class="panel">
-        <button class="recipe-toggle" id="recipeToggle">
-          <span class="rt-label">Tarif Defteri</span>
-          <span id="recipeChevron">▾</span>
-        </button>
-        <div class="recipe-book" id="recipeBook" style="display:none;"></div>
-      </div>
-
-      <footer class="credit">Itamae — sort/merge mutfak prototipi</footer>
+<div class="modal" id="catalogModal" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2>Malzeme ve Tarif Kataloğu</h2>
+      <button class="close-btn" id="catalogClose" type="button">Kapat</button>
     </div>
+    <div class="modal-body" id="catalogBody"></div>
   </div>
 </div>
 
@@ -442,12 +589,17 @@
   const svg = body => `<svg class="ic" viewBox="0 0 32 32" aria-hidden="true">${body}</svg>`;
 
   const ICONS = {
-    PR_RAW: svg(`<g fill="#e0cfa2">
-      <ellipse cx="10" cy="12" rx="2.8" ry="4.6" transform="rotate(-28 10 12)"/>
-      <ellipse cx="20" cy="11" rx="2.8" ry="4.6" transform="rotate(22 20 11)"/>
-      <ellipse cx="8" cy="21" rx="2.8" ry="4.6" transform="rotate(38 8 21)"/>
-      <ellipse cx="16" cy="18" rx="2.8" ry="4.6" transform="rotate(-8 16 18)"/>
-      <ellipse cx="24" cy="20" rx="2.8" ry="4.6" transform="rotate(-42 24 20)"/></g>`),
+    // loose dry grains stacked into a heap — no solid silhouette behind them,
+    // which is what separates it from the cooked mound
+    PR_RAW: svg(`<g fill="#e8d9b0" stroke="#b09767" stroke-width="0.7">
+        <ellipse cx="8.5" cy="23" rx="2.4" ry="3.7" transform="rotate(-16 8.5 23)"/>
+        <ellipse cx="13.5" cy="23.6" rx="2.4" ry="3.7" transform="rotate(-5 13.5 23.6)"/>
+        <ellipse cx="18.5" cy="23.6" rx="2.4" ry="3.7" transform="rotate(5 18.5 23.6)"/>
+        <ellipse cx="23.5" cy="23" rx="2.4" ry="3.7" transform="rotate(16 23.5 23)"/>
+        <ellipse cx="11" cy="17.4" rx="2.4" ry="3.7" transform="rotate(-12 11 17.4)"/>
+        <ellipse cx="16" cy="17.8" rx="2.4" ry="3.7"/>
+        <ellipse cx="21" cy="17.4" rx="2.4" ry="3.7" transform="rotate(12 21 17.4)"/>
+        <ellipse cx="16" cy="11.6" rx="2.4" ry="3.7" transform="rotate(-4 16 11.6)"/></g>`),
 
     PR: svg(`<path d="M5 23c0-6.5 5-11 11-11s11 4.5 11 11z" fill="#fdf7ea"/>
       <g fill="#ffffff" opacity=".9">
@@ -601,6 +753,7 @@
   let spawnDelay=2400, spawnTimer=null;
   let drag=null; // {from:"board"|"pot", index}
   const COOK_MS=4000, BURN_MS=13000, BURN_WARN_MS=8000, ORDER_COUNT=5;
+  let finished=false;
   let pots=[{state:"empty"},{state:"empty"},{state:"empty"}];
   let hintTimer=null;
   let mixIds=[]; // player's own freeform discoveries, in the order they were found
@@ -646,9 +799,6 @@
   const potsEl=document.getElementById("pots");
   const hintEl=document.getElementById("hint");
   const orderListEl=document.getElementById("orderList");
-  const recipeBookEl=document.getElementById("recipeBook");
-  const recipeToggle=document.getElementById("recipeToggle");
-  const recipeChevron=document.getElementById("recipeChevron");
 
 
   // ---- board rendering ------------------------------------------------
@@ -793,13 +943,13 @@
     renderBoard({[d.index]:null});
     pots[potIndex]={state:"cooking"};
     renderPot(potIndex);
-    pots[potIndex].timer=setTimeout(()=>{
+    potTimer(potIndex,"timer",()=>{
       pots[potIndex]={state:"ready"};
       renderPot(potIndex);
 
       // last seconds before it burns: flag the pot in place, so the burn bar
       // keeps running instead of restarting from a re-render
-      pots[potIndex].warnTimer=setTimeout(()=>{
+      potTimer(potIndex,"warnTimer",()=>{
         if(pots[potIndex].state!=="ready") return;
         const el=potsEl.children[potIndex];
         el.classList.add("warning");
@@ -808,12 +958,37 @@
         hint("Pirinç yanmak üzere — tencereden al!");
       }, BURN_WARN_MS);
 
-      pots[potIndex].timer=setTimeout(()=>{
+      potTimer(potIndex,"timer",()=>{
         pots[potIndex]={state:"burnt"};
         renderPot(potIndex);
         hint("Pirinç yandı! Tencereye tıklayıp temizle.");
       }, BURN_MS);
     }, COOK_MS);
+  }
+
+  // timers remember what they were going to do and when, so they can be
+  // suspended while the catalogue is open and picked up where they left off
+  function potTimer(i, key, fn, ms){
+    const p=pots[i];
+    p[key]=setTimeout(fn, ms);
+    p[key+"Fn"]=fn;
+    p[key+"At"]=Date.now()+ms;
+  }
+
+  function pausePots(){
+    pots.forEach(p=>["timer","warnTimer"].forEach(k=>{
+      if(!p[k]) return;
+      clearTimeout(p[k]); p[k]=null;
+      p[k+"Left"]=Math.max(0,(p[k+"At"]||0)-Date.now());
+    }));
+  }
+
+  function resumePots(){
+    pots.forEach((p,i)=>["timer","warnTimer"].forEach(k=>{
+      if(p[k+"Left"]==null || !p[k+"Fn"]) return;
+      potTimer(i, k, p[k+"Fn"], p[k+"Left"]);
+      p[k+"Left"]=null;
+    }));
   }
 
   function stopPotTimers(p){ clearTimeout(p.timer); clearTimeout(p.warnTimer); }
@@ -892,7 +1067,6 @@
     discovered.add(result);
     board[targetIndex]=result;
     renderBoard({[targetIndex]:"merged"});
-    updateRecipeBook();
     if(firstTime){ addScore(10); }
     checkOrders(targetIndex, result);
   }
@@ -1049,40 +1223,84 @@
     }, 420);
   }
 
-  // ---- recipe book --------------------------------------------------------
-  function updateRecipeBook(){
-    recipeBookEl.innerHTML="";
-    DISCOVERABLE_IDS.forEach(id=>{
-      const it=ITEMS[id];
-      const row=document.createElement("div");
-      const isKnown=discovered.has(id);
-      row.className="recipe-row"+(isKnown?"":" locked");
-      row.innerHTML = isKnown
-        ? `<div class="glyph">${pieceHTML(id)}</div><span>${it.name}</span>`
-        : `<div class="glyph locked-mark">?</div><span>??? (${it.tier==="mid"?"ara ürün":"tarif"})</span>`;
-      recipeBookEl.appendChild(row);
-    });
-    if(mixIds.length){
-      const divider=document.createElement("div");
-      divider.style.cssText="font-size:0.7rem;color:var(--text-muted);margin:6px 0 2px;text-transform:uppercase;letter-spacing:0.06em;";
-      divider.textContent="Kendi keşiflerin";
-      recipeBookEl.appendChild(divider);
-      mixIds.forEach(id=>{
-        const row=document.createElement("div");
-        row.className="recipe-row";
-        row.innerHTML=`<div class="glyph">${pieceHTML(id)}</div><span>${ITEMS[id].name}</span>`;
-        recipeBookEl.appendChild(row);
-      });
+  // ---- catalogue ----------------------------------------------------------
+  // Built from the same ITEMS/COMBOS the game plays by, so it can't drift
+  // from what's actually on the board.
+  const RECIPE_OF={};
+  Object.keys(COMBOS).forEach(k=>{ RECIPE_OF[COMBOS[k]]=k.split("+"); });
+
+  const catalogModal=document.getElementById("catalogModal");
+  const catalogBody=document.getElementById("catalogBody");
+
+  const catVisual=id=> ITEMS[id].tier==="raw" ? ITEMS[id].icon : pieceHTML(id);
+  const catBoxStyle=id=> ITEMS[id].tier==="raw"
+    ? `background:${ITEMS[id].bg}26;border-color:${ITEMS[id].bg}59;`
+    : "background:var(--panel-alt);";
+
+  function catCard(id){
+    const it=ITEMS[id];
+    let note="";
+    if(it.tier==="raw"){
+      note=`<span class="cat-made">${id==="PR" ? "tencerede haşlayınca çıkar" : "tezgaha düşer"}</span>`;
+    } else {
+      const pair=RECIPE_OF[id];
+      if(pair){
+        note=`<div class="cat-recipe">
+            <div class="cat-chip">${catVisual(pair[0])}</div><span class="op">+</span>
+            <div class="cat-chip">${catVisual(pair[1])}</div>
+          </div>
+          <span class="cat-made">${ITEMS[pair[0]].name} + ${ITEMS[pair[1]].name}</span>`;
+      } else if(it.mix){
+        note=`<span class="cat-made">${COMPONENTS[id].map(c=>ITEMS[c].name).join(" + ")}</span>`;
+      }
     }
-    recipeToggle.querySelector(".rt-label").textContent =
-      `Tarif Defteri (${discovered.size}/${DISCOVERABLE_IDS.length} tarif${mixIds.length? ` · ${mixIds.length} keşif`:""})`;
+    const found = it.tier!=="raw" && discovered.has(id)
+      ? '<span class="cat-found">yaptın ✓</span>' : "";
+    return `<div class="cat-card">
+        <div class="cat-box" style="${catBoxStyle(id)}">${catVisual(id)}</div>
+        <span class="cat-name">${it.name}</span>${found}${note}
+      </div>`;
   }
 
-  recipeToggle.addEventListener("click", ()=>{
-    const open = recipeBookEl.style.display!=="none";
-    recipeBookEl.style.display = open? "none":"flex";
-    recipeChevron.textContent = open? "▾":"▴";
+  function renderCatalog(){
+    const byTier=t=>Object.keys(ITEMS).filter(id=>ITEMS[id].tier===t && !ITEMS[id].mix);
+    const section=(title,sub,ids)=>ids.length ? `<div class="cat-sec">
+        <h3>${title}<small>${sub}</small></h3>
+        <div class="cat-grid">${ids.map(catCard).join("")}</div>
+      </div>` : "";
+
+    const named=[...byTier("mid"),...byTier("final")];
+    const madeCount=named.filter(id=>discovered.has(id)).length;
+
+    catalogBody.innerHTML=
+        section("Ham Malzemeler","tezgaha bunlar düşer", byTier("raw"))
+      + section("Ara Ürünler","birleştirince oluşur, sipariş olmaz", byTier("mid"))
+      + section("Sushiler",`siparişlerde bunlar istenir — ${madeCount}/${named.length} tarifi yaptın`, byTier("final"))
+      + section("Kendi Keşiflerin","tarifi olmayan, senin uydurduğun birleşimler", mixIds);
+  }
+
+  function openCatalog(){
+    renderCatalog();
+    catalogModal.hidden=false;
+    document.body.classList.add("paused");
+    clearTimeout(spawnTimer);
+    pausePots();
+  }
+
+  function closeCatalog(){
+    catalogModal.hidden=true;
+    document.body.classList.remove("paused");
+    resumePots();
+    if(!finished) scheduleSpawn();
+  }
+
+  document.getElementById("catalogBtn").addEventListener("click", openCatalog);
+  document.getElementById("catalogClose").addEventListener("click", closeCatalog);
+  catalogModal.addEventListener("click", e=>{ if(e.target===catalogModal) closeCatalog(); });
+  document.addEventListener("keydown", e=>{
+    if(e.key==="Escape" && !catalogModal.hidden) closeCatalog();
   });
+
 
   // ---- score / game over --------------------------------------------------
   function addScore(n){
@@ -1091,6 +1309,7 @@
   }
 
   function gameOver(){
+    finished=true;
     clearTimeout(spawnTimer);
     pots.forEach(stopPotTimers);
     document.getElementById("finalScore").textContent=score;
@@ -1107,7 +1326,7 @@
   // ---- boot -----------------------------------------------------------
   function startGame(){
     board=new Array(SLOT_COUNT).fill(null);
-    score=0; ordersDone=0; spawnDelay=2400; discovered=new Set();
+    score=0; ordersDone=0; spawnDelay=2400; discovered=new Set(); finished=false;
     clearMixes();
     clearPots();
     drag=null;
@@ -1120,7 +1339,6 @@
     buildPots();
     renderBoard();
     renderOrders();
-    updateRecipeBook();
     // fixed opening hand: enough rice and nori to cook and roll straight away
     ["PR_RAW","PR_RAW","PR_RAW","NR","NR"].forEach(id=>{
       const empties=emptySlots();
