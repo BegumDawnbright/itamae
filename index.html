@@ -1779,9 +1779,11 @@
     const max=catalogBody.scrollHeight-catalogBody.clientHeight;
     if(max<40) return;
     const smooth=matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
-    const to=Math.min(max, catalogBody.clientHeight*0.85);
-    setTimeout(()=>catalogBody.scrollTo({top:to, behavior:smooth}), 600);
-    setTimeout(()=>catalogBody.scrollTo({top:0, behavior:smooth}), 2300);
+    const view=catalogBody.clientHeight;
+    // two hops rather than one, and it stays down: the player is left looking
+    // at the middle of the list, which is the point being made
+    setTimeout(()=>catalogBody.scrollTo({top:Math.min(max, view*0.55), behavior:smooth}), 650);
+    setTimeout(()=>catalogBody.scrollTo({top:Math.min(max, view*1.15), behavior:smooth}), 1750);
   }
 
   function openCatalog(){
