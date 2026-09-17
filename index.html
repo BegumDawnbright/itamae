@@ -178,23 +178,41 @@
   }
   .pot.dragover{border-color:var(--salmon);background:rgba(242,144,122,0.12);}
   .pot-slot{
-    width:46px;height:40px;
-    border-radius:6px 6px 46% 46% / 6px 6px 34% 34%;
-    background:#11161a;
-    border:2px solid rgba(243,233,210,0.18);
-    border-top-width:3px;
-    display:flex;align-items:center;justify-content:center;
+    position:relative;
+    width:100%;max-width:72px;aspect-ratio:64/46;
+    margin:0 auto;
   }
-  .pot-slot svg.ic{width:76%;height:76%;}
+  .pot-svg{display:block;width:100%;height:100%;}
+  /* the rice sits in the pot's mouth rather than inside a box */
   .pot-slot .cooked-rice,.pot-slot .burnt-rice{
-    width:76%;height:76%;display:flex;align-items:center;justify-content:center;
+    position:absolute;left:50%;top:0;transform:translate(-50%,-18%);
+    width:46%;display:block;
   }
   .pot-slot .cooked-rice svg.ic,.pot-slot .burnt-rice svg.ic{width:100%;height:100%;}
-  .pot.ready .pot-slot{border-color:var(--wasabi);box-shadow:0 0 0 3px rgba(127,168,76,0.18);}
+
+  .steam{
+    position:absolute;left:50%;top:-14%;transform:translateX(-50%);
+    width:42%;height:34%;pointer-events:none;
+  }
+  .steam i{
+    position:absolute;bottom:0;width:26%;aspect-ratio:1;border-radius:50%;
+    background:rgba(255,255,255,0.6);filter:blur(2px);opacity:0;
+  }
+  .steam i:nth-child(1){left:2%;animation:steam 2.3s ease-out infinite;}
+  .steam i:nth-child(2){left:37%;animation:steam 2.3s ease-out 0.75s infinite;}
+  .steam i:nth-child(3){left:72%;animation:steam 2.3s ease-out 1.5s infinite;}
+  @keyframes steam{
+    0%{opacity:0;transform:translateY(0) scale(0.6);}
+    30%{opacity:0.7;}
+    100%{opacity:0;transform:translateY(-140%) scale(1.5);}
+  }
+  @media (prefers-reduced-motion:reduce){ .steam{display:none;} }
+
+  .pot.ready .pot-slot{filter:drop-shadow(0 0 5px rgba(127,168,76,0.75));}
   .pot.ready .cooked-rice{cursor:grab;}
   .pot.ready .cooked-rice:active{cursor:grabbing;}
   .pot.burnt{cursor:pointer;border-color:rgba(242,144,122,0.5);}
-  .pot.burnt .pot-slot{border-color:var(--salmon);background:#1a0f0d;}
+  .pot.burnt .pot-slot{filter:drop-shadow(0 0 5px rgba(242,144,122,0.7));}
   .pot.burnt .pot-label{color:var(--salmon);}
   .pot-bar{width:100%;height:4px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden;}
   .pot-bar i{display:block;height:100%;width:0;background:var(--gold);}
@@ -206,14 +224,15 @@
 
   /* last seconds before it burns */
   .pot.warning{border-color:var(--salmon);animation:warn 0.9s ease-in-out infinite;}
-  .pot.warning .pot-slot{border-color:var(--salmon);}
+  .pot.warning .pot-slot{filter:drop-shadow(0 0 6px rgba(226,80,58,0.85));}
   .pot.warning .pot-label{color:var(--salmon);font-weight:700;}
 
   @keyframes fill{from{width:0;}to{width:100%;}}
+  /* second pass over the same bar, red from the first pixel: the gold fill
+     was progress, this one is danger accumulating */
   @keyframes burn{
-    from{width:0;background:var(--wasabi);}
-    45%{background:var(--gold);}
-    to{width:100%;background:#e2503a;}
+    from{width:0;background:#e8674f;}
+    to{width:100%;background:#c0271a;}
   }
   @keyframes warn{
     0%,100%{box-shadow:0 0 0 0 rgba(226,80,58,0);}
@@ -247,6 +266,26 @@
     transition:background 0.25s, border-color 0.25s;
   }
   .order.done{border-top-color:var(--wasabi);background:rgba(127,168,76,0.15);}
+  /* the chef's call-back when a plate goes out */
+  .cheer{
+    position:absolute;left:50%;top:-4px;
+    font-family:"Shippori Mincho",serif;font-weight:700;font-size:0.9rem;
+    color:#b8433a;white-space:nowrap;pointer-events:none;z-index:3;
+    text-shadow:0 1px 0 #fff8e8, 0 2px 7px rgba(60,35,10,0.3);
+    animation:cheerUp 1.7s ease-out forwards;
+  }
+  @keyframes cheerUp{
+    0%  {opacity:0;transform:translate(-50%,8px) scale(0.75);}
+    16% {opacity:1;transform:translate(-50%,-6px) scale(1.1);}
+    28% {opacity:1;transform:translate(-50%,-8px) scale(1);}
+    70% {opacity:1;transform:translate(-50%,-18px) scale(1);}
+    100%{opacity:0;transform:translate(-50%,-34px) scale(1);}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .cheer{animation:cheerFade 1.7s ease-out forwards;}
+    @keyframes cheerFade{0%,70%{opacity:1;transform:translate(-50%,-10px);}100%{opacity:0;transform:translate(-50%,-10px);}}
+  }
+
   .order .glyph{
     width:60px;height:60px;border-radius:10px;flex:none;
     background:#161b1f;
@@ -368,6 +407,51 @@
 
   /* reading the catalogue shouldn't cost you the board */
   body.paused .pot-bar i,body.paused .pot.warning{animation-play-state:paused;}
+
+  /* ---- tutorial ---- */
+  .tut-bar{
+    display:flex;align-items:center;gap:10px;
+    background:#fff6dc;border:1px solid #d8c089;border-left:4px solid var(--hanko,#b8433a);
+    border-radius:9px;padding:9px 12px;
+    box-shadow:0 3px 8px rgba(45,25,8,0.25);
+  }
+  .tut-step{
+    flex:none;font-family:"JetBrains Mono",monospace;font-size:0.7rem;font-weight:700;
+    color:#fff6ea;background:#b8433a;border-radius:20px;padding:2px 9px;
+  }
+  .tut-text{font-size:0.82rem;color:#3a2c1e;line-height:1.35;}
+
+  .tut-hand{
+    position:fixed;z-index:65;width:66px;height:66px;pointer-events:none;
+    animation:handDrag 2.6s ease-in-out infinite;
+    filter:drop-shadow(0 4px 7px rgba(0,0,0,0.5));
+  }
+  .tut-hand svg{width:100%;height:100%;display:block;}
+  @keyframes handDrag{
+    0%   {transform:translate(-30%,-14%) scale(1);opacity:0;}
+    8%   {transform:translate(-30%,-14%) scale(1);opacity:1;}
+    18%  {transform:translate(-30%,-14%) scale(0.82);opacity:1;}
+    62%  {transform:translate(calc(-30% + var(--dx,0px)),calc(-14% + var(--dy,0px))) scale(0.82);opacity:1;}
+    74%  {transform:translate(calc(-30% + var(--dx,0px)),calc(-14% + var(--dy,0px))) scale(1);opacity:1;}
+    92%  {transform:translate(calc(-30% + var(--dx,0px)),calc(-14% + var(--dy,0px))) scale(1);opacity:0;}
+    100% {transform:translate(-30%,-14%) scale(1);opacity:0;}
+  }
+
+  /* nothing burns during the lesson, so don't run a bar that threatens it */
+  body.tutorial .pot.ready .pot-bar i{animation:none;width:0;}
+
+  /* the only two things you can touch during a step */
+  /* two classes deep, so the skin's own .slot/.pot shadows can't win the tie */
+  .tut-src,.tut-dst{position:relative;z-index:2;border-radius:9px;}
+  .slot.tut-src,.pot.tut-src,.catalog-btn.tut-src{box-shadow:0 0 0 4px #ffcf3a, 0 0 18px 4px rgba(255,207,58,0.75);}
+  .slot.tut-dst,.pot.tut-dst{box-shadow:0 0 0 4px #63c93c, 0 0 18px 4px rgba(99,201,60,0.7);}
+  .tut-src,.tut-dst{animation:tutPulse 1.4s ease-in-out infinite;}
+  @keyframes tutPulse{50%{filter:brightness(1.22);}}
+
+  @media (prefers-reduced-motion:reduce){
+    .tut-hand{animation-duration:0s;opacity:1;}
+    .tut-src,.tut-dst{animation:none;}
+  }
 
   /* ===================================================================
      Skin — a sushi counter in daylight.
@@ -509,10 +593,6 @@
     box-shadow:inset 0 2px 8px rgba(0,0,0,0.5);
   }
   .pot{background:linear-gradient(#49545d,#333c44);border-color:rgba(255,245,225,0.14);}
-  .pot-slot{
-    background:radial-gradient(60% 70% at 50% 25%, #2b343b 0%, #0e1215 100%);
-    border-color:#8c9aa5;border-top-color:#c3cfd8;
-  }
   .pot-label{color:#c3cfd8;}
   .trash{
     background:linear-gradient(#3b444c,#2a3238);
@@ -555,8 +635,15 @@
     /* the whole game has to sit in one screen — you drag between the orders,
        the board and the stove, and a scroll mid-drag loses the move */
     html,body{height:100%;overflow:hidden;}
-    body{padding:8px 12px 10px;height:100dvh;}
-    .wrap{height:100%;justify-content:center;}
+    body{
+      padding:8px 12px calc(10px + env(safe-area-inset-bottom,0px));
+      height:100vh;
+      /* svh, not dvh: the *small* viewport is the one with the browser's
+         toolbars showing. Sizing to dvh lets the stove slide under Safari's
+         bottom bar the moment it reappears. */
+      height:100svh;
+    }
+    .wrap{height:100%;justify-content:flex-start;}
     .topbar{padding:11px 13px 10px;margin-bottom:10px;border-radius:10px 10px 0 0;}
     .topbar::after{bottom:-9px;height:10px;}
     .wrap{gap:6px;}
@@ -585,25 +672,58 @@
 
     /* 6 columns keeps the board at 5 rows; 5 columns would add a sixth */
     .board-card h2{display:none;}
-    /* Everything except the board costs ~330px on a phone, so cap the board
-       to what's left: cells are square, 6 across by 5 down, so the width that
-       fits a given height is height x 6/5. dvh follows the browser chrome. */
+
+    /* The board takes whatever height is left over instead of a guessed
+       reserve — Safari's toolbars change that number as you play. Rows are
+       explicit so the square cells follow the board, not the other way
+       round, which would be circular. */
+    .board-layout{flex:1 1 auto;min-height:0;}
+    .board-card{display:flex;flex-direction:column;min-height:0;}
     .board{
-      grid-template-columns:repeat(6,1fr);gap:5px;padding:5px;
-      width:min(100%, calc((100vh - 340px) * 1.2));
-      width:min(100%, calc((100dvh - 340px) * 1.2));
-      margin-inline:auto;
+      grid-template-columns:repeat(6,1fr);
+      grid-template-rows:repeat(5,1fr);
+      gap:5px;padding:5px;
+      flex:1 1 auto;min-height:0;
+      align-self:center;width:auto;max-width:100%;
+      aspect-ratio:6/5;
+      /* on a tall screen there is spare height; without this cap the board
+         stretches and the cells stop being square */
+      max-height:calc((100vw - 46px) * 5 / 6);
     }
+    .slot{aspect-ratio:auto;min-height:0;}
+    .hint,.stove-row{flex:none;}
     .hint{font-size:0.72rem;margin-top:6px;min-height:1.1em;}
 
     .pots-title{display:none;}
     .stove-row{gap:7px;margin-top:7px;}
     .pot{padding:6px 4px;gap:4px;}
-    .pot-slot{width:38px;height:32px;}
+    .pot-slot{max-width:60px;}
     .pot-label{font-size:0.58rem;}
     .trash{flex-basis:54px;padding:7px 4px;}
     .trash svg.ic{width:22px;height:22px;}
     .trash-label{font-size:0.58rem;}
+  }
+
+  /* Short viewport (small phone, or Safari with both toolbars showing):
+     every other block gives up height so the cells stay tappable. */
+  @media (max-width:560px) and (max-height:660px){
+    .howto{display:none;}
+    .wrap{gap:5px;}
+    .topbar{padding:8px 11px 7px;margin-bottom:8px;}
+    .topbar::after{bottom:-7px;height:8px;}
+    .brand .kanji{font-size:1.15rem;}
+    .stat .value{font-size:0.95rem;}
+    .catalog-btn{padding:4px 9px;font-size:0.72rem;}
+    .order{padding:5px 3px 4px;gap:3px;}
+    .order .glyph{max-width:32px;height:31px;border-radius:6px;}
+    .order .name{font-size:0.5rem;-webkit-line-clamp:2;}
+    .pot{padding:5px 3px;gap:3px;}
+    .pot-slot{max-width:48px;}
+    .pot-label,.trash-label{display:none;}
+    .trash{flex-basis:44px;}
+    .trash svg.ic{width:20px;height:20px;}
+    .tut-bar{padding:6px 9px;}
+    .tut-text{font-size:0.74rem;}
   }
 </style>
 </head>
@@ -622,8 +742,14 @@
         <div class="stat"><span class="label">Puan</span><span class="value" id="scoreVal">0</span></div>
         <div class="stat"><span class="label">Tamamlanan</span><span class="value" id="doneVal">0</span></div>
       </div>
+      <button class="catalog-btn" id="tutorialBtn" type="button">Eğitim</button>
       <button class="catalog-btn" id="catalogBtn" type="button">Katalog</button>
     </div>
+  </div>
+
+  <div class="tut-bar" id="tutBar" hidden>
+    <span class="tut-step" id="tutStep">1/4</span>
+    <span class="tut-text" id="tutText"></span>
   </div>
 
   <details class="howto" id="howto">
@@ -661,6 +787,22 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<div class="tut-hand" id="tutHand" hidden aria-hidden="true">
+  <svg viewBox="0 0 48 48">
+    <path d="M17.5 27V12.5a3.75 3.75 0 0 1 7.5 0V21h1.6a3 3 0 0 1 3 3v.8h1.4a3 3 0 0 1 3 3v1.2h1.1a3 3 0 0 1 3 3v3.4c0 5.3-4.3 9.6-9.6 9.6h-4.7c-3.2 0-6.1-1.7-7.7-4.5l-4.9-8.4a3.1 3.1 0 0 1 5.2-3.4z"
+      fill="#fffdf6" stroke="#221913" stroke-width="2.4" stroke-linejoin="round"/>
+  </svg>
+</div>
+
+<div class="overlay" id="tutDone">
+  <div class="overlay-card">
+    <h2>İlk siparişin hazır</h2>
+    <p>Malzemeleri birleştirmeyi öğrendin. Gerçek serviste siparişler birikir,
+      tezgah dolar ve pirinç beklerse yanar.</p>
+    <button class="restart-btn" id="tutDoneBtn" type="button">Servisi aç</button>
   </div>
 </div>
 
@@ -1006,6 +1148,7 @@
   function dropInTrash(){
     const d=drag; drag=null;
     if(!d) return;
+    if(tutorial) return tutRefuse();
 
     if(d.from==="pot"){
       if(pots[d.index].state==="empty") return;
@@ -1043,21 +1186,55 @@
     });
   }
 
+  // A real vessel: handles, a steel body and an open mouth whose contents
+  // change with the state, so the pot itself reports what's going on.
+  function potVessel(state){
+    const contents =
+      state==="cooking" ? `<ellipse cx="32" cy="15.5" rx="16.5" ry="3.7" fill="#cdbd94"/>
+          <g fill="#efe3c2">
+            <ellipse cx="25" cy="15" rx="2.6" ry="1.4"/><ellipse cx="33" cy="16.2" rx="2.6" ry="1.4"/>
+            <ellipse cx="40" cy="14.9" rx="2.6" ry="1.4"/></g>` :
+      state==="burnt"   ? `<ellipse cx="32" cy="15.5" rx="16.5" ry="3.7" fill="#2b2320"/>
+          <g fill="#4a3b33"><ellipse cx="27" cy="15.3" rx="3" ry="1.5"/><ellipse cx="37" cy="16" rx="3" ry="1.5"/></g>` :
+      state==="ready"   ? `<ellipse cx="32" cy="15.5" rx="16.5" ry="3.7" fill="#efe6cf"/>` :
+                          `<ellipse cx="32" cy="15.5" rx="16.5" ry="3.7" fill="#121a20"/>`;
+
+    return `<svg class="pot-svg" viewBox="0 0 64 46" aria-hidden="true">
+        <g fill="none" stroke-linecap="round">
+          <path d="M11 19H5.5a4.5 4.5 0 0 0 0 9H11" stroke="#1b2227" stroke-width="8"/>
+          <path d="M53 19h5.5a4.5 4.5 0 0 1 0 9H53" stroke="#1b2227" stroke-width="8"/>
+          <path d="M11 19H5.5a4.5 4.5 0 0 0 0 9H11" stroke="#8795a0" stroke-width="4"/>
+          <path d="M53 19h5.5a4.5 4.5 0 0 1 0 9H53" stroke="#8795a0" stroke-width="4"/>
+        </g>
+        <path d="M11 14h42l-3.4 23.2A6 6 0 0 1 43.7 42.5H20.3a6 6 0 0 1-5.9-5.3z"
+          fill="#5c6871" stroke="#1b2227" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M17 19.5l2.4 18" stroke="#828f99" stroke-width="3.4" stroke-linecap="round" opacity=".8"/>
+        <ellipse cx="32" cy="14.5" rx="23" ry="6.2" fill="#9aa8b2" stroke="#1b2227" stroke-width="2.2"/>
+        <ellipse cx="32" cy="15.4" rx="19" ry="4.6" fill="#232b31"/>
+        ${contents}
+      </svg>`;
+  }
+
   function renderPot(i){
     const p=pots[i], el=potsEl.children[i];
     el.className="pot "+p.state;
-    const inside =
+    const overlay =
       p.state==="ready"   ? `<span class="cooked-rice" title="${ITEMS.PR.name}">${ITEMS.PR.icon}</span>` :
-      p.state==="cooking" ? ITEMS.PR_RAW.icon :
       p.state==="burnt"   ? `<span class="burnt-rice">${ICONS.BURNT}</span>` : "";
+    const steam = p.state==="cooking" ? '<span class="steam"><i></i><i></i><i></i></span>' : "";
+    const inside = potVessel(p.state) + steam + overlay;
     const label =
       p.state==="ready"   ? "hazır — çabuk al" :
       p.state==="cooking" ? "haşlanıyor…" :
       p.state==="burnt"   ? "yandı — tıkla" : "boş tencere";
+    // both passes need their duration spelled out — a keyframed bar with no
+    // duration finishes instantly and just sits there full
+    const barMs = p.state==="cooking" ? COOK_MS : p.state==="ready" ? BURN_MS : 0;
     el.innerHTML =
       `<div class="pot-slot">${inside}</div>` +
-      `<div class="pot-bar"><i${p.state==="cooking"?` style="animation-duration:${COOK_MS}ms"`:""}></i></div>` +
+      `<div class="pot-bar"><i${barMs?` style="animation-duration:${barMs}ms"`:""}></i></div>` +
       `<span class="pot-label">${label}</span>`;
+    if(tutorial) setTimeout(refreshTutorial,0);
     if(p.state==="ready"){
       const rice=el.querySelector(".cooked-rice");
       rice.addEventListener("pointerdown", ev=>beginDrag({from:"pot", index:i}, rice, ev));
@@ -1067,6 +1244,7 @@
   function dropOnPot(potIndex){
     const d=drag; drag=null;
     if(!d || d.from!=="board") return;
+    if(tutorial && !tutAllows(d,{kind:"pot", index:potIndex})) return tutRefuse();
     if(pots[potIndex].state!=="empty"){ hint("Bu tencere şu an dolu."); return; }
     if(board[d.index]!=="PR_RAW"){ hint("Tencereye sadece çiğ pirinç girer."); return; }
 
@@ -1074,12 +1252,15 @@
     renderBoard({[d.index]:null});
     pots[potIndex]={state:"cooking"};
     renderPot(potIndex);
+    tutAdvance();
     potTimer(potIndex,"timer",()=>{
       pots[potIndex]={state:"ready"};
       renderPot(potIndex);
 
       // last seconds before it burns: flag the pot in place, so the burn bar
       // keeps running instead of restarting from a re-render
+      if(tutorial){ refreshTutorial(); return; }
+
       potTimer(potIndex,"warnTimer",()=>{
         if(pots[potIndex].state!=="ready") return;
         const el=potsEl.children[potIndex];
@@ -1205,6 +1386,7 @@
   function handleDrop(targetIndex){
     const d=drag; drag=null;
     if(!d) return;
+    if(tutorial && !tutAllows(d,{kind:"board", index:targetIndex})) return tutRefuse();
 
     if(d.from==="pot") return dropRiceFromPot(d.index, targetIndex);
     if(d.index===targetIndex) return;
@@ -1230,6 +1412,7 @@
       board[srcIndex]=null;
       renderBoard({[srcIndex]:null});
       applyMerge(targetIndex, result);
+      tutAdvance();
     } else {
       // no recipe for this pair — leave both tiles exactly where they are
       // and shake them, so a failed attempt reads clearly as failed
@@ -1253,6 +1436,7 @@
     if(result){
       emptyPot(potIndex);
       applyMerge(targetIndex, result);
+      tutAdvance();
     } else {
       shakeSlots([targetIndex]);
     }
@@ -1307,6 +1491,7 @@
 
   function scheduleSpawn(){
     clearTimeout(spawnTimer);
+    if(tutorial) return;
     spawnTimer=setTimeout(spawnOne, spawnDelay);
   }
 
@@ -1336,23 +1521,203 @@
     });
   }
 
+  const CHEERS=["Arigato!","Oishii!","Umai!","Hai, dozo!","Kanpai!","Gochisosama!","Mata dozo!"];
+
+  function cheer(orderIndex){
+    const card=orderListEl.children[orderIndex];
+    if(!card) return;
+    const el=document.createElement("span");
+    el.className="cheer";
+    el.textContent=CHEERS[Math.floor(Math.random()*CHEERS.length)];
+    card.appendChild(el);
+    setTimeout(()=>el.remove(), 1700);
+  }
+
   function checkOrders(slotIndex, resultId){
     const match=orders.find(o=>o.id===resultId && !o.done);
     if(!match) return;
     match.done=true;
     renderOrders();
+    cheer(orders.indexOf(match));
     setTimeout(()=>{
       board[slotIndex]=null;
       renderBoard({[slotIndex]:null});
       addScore(ITEMS[resultId].rare?250:100);
       ordersDone++;
       document.getElementById("doneVal").textContent=ordersDone;
+      if(tutorial){ refreshTutorial(); return; }
       orders=orders.filter(o=>o!==match);
       orders.push({id:pickNewOrder(), done:false});
       renderOrders();
       spawnDelay=Math.max(900, spawnDelay-60);
     }, 420);
   }
+
+  // ---- tutorial -----------------------------------------------------------
+  // A scripted one-order level: a hand traces each drag and only that drag is
+  // accepted, so the four ideas (cook, combine, unload, finish) land in order.
+  let tutorial=null;
+  const tutBar=document.getElementById("tutBar");
+  const tutText=document.getElementById("tutText");
+  const tutStepLabel=document.getElementById("tutStep");
+  const tutHand=document.getElementById("tutHand");
+  const TUT_KEY="itamae-tutorial-done";
+
+  const tutSeen =()=>{ try{ return localStorage.getItem(TUT_KEY)==="1"; }catch(e){ return false; } };
+  const markTutSeen=()=>{ try{ localStorage.setItem(TUT_KEY,"1"); }catch(e){} };
+
+  function findSlot(pred){
+    for(let i=0;i<SLOT_COUNT;i++) if(board[i] && pred(board[i])) return i;
+    return -1;
+  }
+
+  function tutPlace(id){
+    const empties=emptySlots();
+    if(!empties.length) return;
+    const idx=empties[Math.floor(Math.random()*empties.length)];
+    board[idx]=id;
+    renderBoard({[idx]:"spawn-in"});
+    refreshTutorial();
+  }
+
+  const TUT_STEPS=[
+    {
+      text:"Çiğ pirinci ocaktaki tencereye sürükle — pişmeden kullanamazsın.",
+      src:()=>({kind:"board", index:findSlot(id=>id==="PR_RAW")}),
+      dst:()=>({kind:"pot", index:0}),
+      after:()=>{ setTimeout(()=>tutPlace("AV"), 450); setTimeout(()=>tutPlace("SM"), 1300); },
+    },
+    {
+      text:"Pirinç haşlanırken boş durma: avokadoyu somonun üstüne bırak.",
+      ready:()=>findSlot(id=>id==="AV")>=0 && findSlot(id=>id==="SM")>=0,
+      wait:"Tezgaha yeni malzeme geliyor…",
+      src:()=>({kind:"board", index:findSlot(id=>id==="AV")}),
+      dst:()=>({kind:"board", index:findSlot(id=>id==="SM")}),
+    },
+    {
+      text:"Nori'yi de üstüne ekle — malzemeler tek tek birikir.",
+      src:()=>({kind:"board", index:findSlot(id=>id==="NR")}),
+      dst:()=>({kind:"board", index:findSlot(id=>ITEMS[id].mix)}),
+    },
+    {
+      // rice goes on last on purpose: it shows the order of assembly is free
+      text:"Son adım: haşlanmış pirinci hepsinin üstüne bırak.",
+      ready:()=>pots[0].state==="ready",
+      wait:"Pirincin haşlanmasını bekle…",
+      src:()=>({kind:"pot", index:0}),
+      dst:()=>({kind:"board", index:findSlot(id=>ITEMS[id].mix)}),
+    },
+    {
+      // src and dst are the same element, so the hand presses instead of dragging
+      text:"Tarifi unutursan Katalog'da hepsi yazıyor. Aç, bir göz at.",
+      tap:true,
+      src:()=>({kind:"catalog"}),
+      dst:()=>({kind:"catalog"}),
+    },
+  ];
+
+  const tutStepReady=st=> !st.ready || st.ready();
+  function tutElement(ref){
+    if(!ref) return null;
+    if(ref.kind==="catalog") return document.getElementById("catalogBtn");
+    if(ref.index<0) return null;
+    return ref.kind==="pot" ? potsEl.children[ref.index] : boardEl.children[ref.index];
+  }
+
+  function clearTutMarks(){
+    document.querySelectorAll(".tut-src,.tut-dst")
+      .forEach(el=>el.classList.remove("tut-src","tut-dst"));
+  }
+
+  function refreshTutorial(){
+    if(!tutorial) return;
+    clearTutMarks();
+    const st=TUT_STEPS[tutorial.step];
+    tutStepLabel.textContent=`${Math.min(tutorial.step+1,TUT_STEPS.length)}/${TUT_STEPS.length}`;
+
+    if(!st){ tutText.textContent="Sipariş hazır!"; tutHand.hidden=true; return; }
+    if(!tutStepReady(st)){ tutText.textContent=st.wait||"…"; tutHand.hidden=true; return; }
+
+    tutText.textContent=st.text;
+    const from=tutElement(st.src()), to=tutElement(st.dst());
+    if(!from || !to){ tutHand.hidden=true; return; }
+
+    from.classList.add("tut-src");
+    if(to!==from) to.classList.add("tut-dst");
+
+    const a=from.getBoundingClientRect(), b=to.getBoundingClientRect();
+    const ax=a.left+a.width/2, ay=a.top+a.height/2;
+    tutHand.style.left=ax+"px";
+    tutHand.style.top=ay+"px";
+    tutHand.style.setProperty("--dx",(b.left+b.width/2-ax)+"px");
+    tutHand.style.setProperty("--dy",(b.top+b.height/2-ay)+"px");
+    tutHand.hidden=false;
+  }
+
+  // force-tap: anything that isn't the step's own drag is refused
+  function tutAllows(d, target){
+    if(!tutorial) return true;
+    const st=TUT_STEPS[tutorial.step];
+    if(!st || !tutStepReady(st)) return false;
+    const same=(x,y)=> x && y && x.kind===y.kind && x.index===y.index && x.index>=0;
+    const dragged={kind:d.from, index:d.index};
+    const s=st.src(), t=st.dst();
+    if(same(dragged,s) && same(target,t)) return true;
+    // a board-to-board merge is the same move from either side
+    return s.kind==="board" && t.kind==="board" && same(dragged,t) && same(target,s);
+  }
+
+  function tutRefuse(){
+    hint("Şimdilik sadece parmağın gösterdiği hamleyi yap.");
+    refreshTutorial();
+  }
+
+  function tutAdvance(){
+    if(!tutorial) return;
+    const st=TUT_STEPS[tutorial.step];
+    tutorial.step++;
+    if(st && st.after) st.after();
+    refreshTutorial();
+  }
+
+  function startTutorial(){
+    clearTimeout(spawnTimer);
+    clearMixes(); clearPots();
+    drag=null; finished=false;
+    score=0; ordersDone=0; discovered=new Set();
+    document.getElementById("scoreVal").textContent=0;
+    document.getElementById("doneVal").textContent=0;
+    board=new Array(SLOT_COUNT).fill(null);
+    orders=[{id:"SOMON_AVO", done:false}];
+
+    buildSlots(); buildPots(); renderOrders();
+    board[8]="PR_RAW"; board[11]="NR";   // the starting hand, already on the counter
+    renderBoard();
+
+    tutorial={step:0};
+    document.body.classList.add("tutorial");
+    document.getElementById("howto").hidden=true;
+    tutBar.hidden=false;
+    refreshTutorial();
+  }
+
+  function finishTutorial(){
+    tutorial=null;
+    document.body.classList.remove("tutorial");
+    tutHand.hidden=true;
+    clearTutMarks();
+    tutBar.hidden=true;
+    markTutSeen();
+    document.getElementById("tutDone").classList.add("show");
+  }
+
+  document.getElementById("tutorialBtn").addEventListener("click", startTutorial);
+  document.getElementById("tutDoneBtn").addEventListener("click", ()=>{
+    document.getElementById("tutDone").classList.remove("show");
+    document.getElementById("howto").hidden=false;
+    startGame();
+  });
+  window.addEventListener("resize", ()=>refreshTutorial());
 
   // ---- catalogue ----------------------------------------------------------
   // Built from the same ITEMS/COMBOS the game plays by, so it can't drift
@@ -1408,15 +1773,30 @@
       + section("Kendi Keşiflerin","tarifi olmayan, senin uydurduğun birleşimler", mixIds);
   }
 
+  // during the lesson the list scrolls itself once, so the player learns
+  // there is more below the fold
+  function demoScroll(){
+    const max=catalogBody.scrollHeight-catalogBody.clientHeight;
+    if(max<40) return;
+    const smooth=matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+    const to=Math.min(max, catalogBody.clientHeight*0.85);
+    setTimeout(()=>catalogBody.scrollTo({top:to, behavior:smooth}), 600);
+    setTimeout(()=>catalogBody.scrollTo({top:0, behavior:smooth}), 2300);
+  }
+
   function openCatalog(){
+    const teaching = tutorial && (TUT_STEPS[tutorial.step]||{}).tap;
+    if(teaching) tutAdvance();
     renderCatalog();
     catalogModal.hidden=false;
     document.body.classList.add("paused");
     clearTimeout(spawnTimer);
     pausePots();
+    if(teaching) demoScroll();
   }
 
   function closeCatalog(){
+    if(tutorial && tutorial.step>=TUT_STEPS.length){ catalogModal.hidden=true; finishTutorial(); return; }
     catalogModal.hidden=true;
     document.body.classList.remove("paused");
     resumePots();
@@ -1458,6 +1838,12 @@
     score=0; ordersDone=0; spawnDelay=2400; discovered=new Set(); finished=false;
     clearMixes();
     clearPots();
+    document.body.classList.remove("tutorial");
+    tutorial=null;
+    tutBar.hidden=true;
+    tutHand.hidden=true;
+    clearTutMarks();
+    document.getElementById("howto").hidden=false;
     drag=null;
     hintEl.classList.remove("show");
     document.getElementById("scoreVal").textContent=0;
@@ -1481,7 +1867,7 @@
   // screen there's room to leave them open
   if(window.innerWidth>=700) document.getElementById("howto").open=true;
 
-  const boot = ()=> startGame();
+  const boot = ()=> tutSeen() ? startGame() : startTutorial();
   if(window.claude?.hot){
     window.claude.hot.ready ? window.claude.hot.ready(boot) : boot();
   } else {
